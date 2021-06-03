@@ -49,12 +49,6 @@ Begin {
             throw "Input file '$ImportFile': No 'OU' found."
         }
 
-        if ($NoOCSGroupName = ($File.Group.Where( { $_.Type -eq 'NoOCS' })).Name) {
-            if (-not (Get-ADObject -Filter 'SamAccountName -eq $NoOCSGroupName -and ObjectClass -eq "group"')) {
-                throw "Input file '$ImportFile': NoOCSGroupName '$NoOCSGroupName' does not exist."
-            }
-        }
-
         $AllowedEmployeeType = $File.AllowedEmployeeType
 
         if ($GitOU = $File.Git.OU) {
@@ -856,21 +850,6 @@ Process {
                     ($_.EmployeeType -EQ 'Vendor') -and
                     (($_.AccountExpirationDate -eq $null) -or ($_.AccountExpirationDate -gt $YearAheadDate)) })
         }
-
-        #region No OCS users
-        if ($NoOCSGroupName) {
-            $ExcludedOCSUsers = Get-ADGroupMember $NoOCSGroupName -Recursive
-        }
-
-        Write-Verbose 'Get user NoOcs'
-        $AllObjects['User - NoOcs'] = @{
-            Description      = "No OCS mail address for Office Communicator, Skype, ... //AUTO TICKET<br>(Excluding members of group '$NoOCSGroupName')"
-            WorksheetName    = 'NoOcs'
-            PropertyToExport = '*'
-            Type             = 'User'
-            Data             = @(Get-AdUserWithoutOcsHC -OU $OU).where( { $ExcludedOCSUsers.SamAccountName -NotContains $_.'Logon name' })
-        }
-        #endregion
 
         #region Quota management
         Write-Verbose 'Get quota management groups'

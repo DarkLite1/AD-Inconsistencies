@@ -70,7 +70,6 @@ BeforeAll {
     Mock Get-ADObject { $true }
     Mock Get-ADOrganizationalUnit
     Mock Get-ADUser
-    Mock Get-ADUserWithoutOCSHC
     Mock Get-ADTSProfileHC
     Mock Test-ADOUExistsHC { $true }
 }
@@ -309,7 +308,6 @@ Describe 'ROL Groups' {
         Mock Get-ADComputer
         Mock Get-ADGroupMember
         Mock Get-ADUser
-        Mock Get-ADuserWithoutOCSHC
         Mock Get-ADOrganizationalUnit {
             [PSCustomObject]@{
                 CanonicalName = 'contoso.com/EU/BEL'
