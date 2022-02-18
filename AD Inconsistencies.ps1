@@ -434,7 +434,7 @@ Process {
             if ($RolPlaceholderAccount) {
                 Write-Verbose 'Get ROL group PlaceHolder'
                 $AllObjects['RolGroup - PlaceHolder'] = @{
-                    Description      = "Missing place holder account '$RolPlaceholderAccount' as member //AUTO TICKET"
+                    Description      = "Missing place holder account '$RolPlaceholderAccount' as member"
                     WorksheetName    = $RolGroupWorksheetName
                     PropertyToExport = $null
                     Type             = $RolGroupType
