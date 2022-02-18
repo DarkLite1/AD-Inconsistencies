@@ -52,7 +52,7 @@ Begin {
         $AllowedEmployeeType = $File.AllowedEmployeeType
 
         if ($GitOU = $File.Git.OU) {
-            if (-not (Test-ADOUExistsHC $GitOU)) {
+            if (-not (Test-ADOuExistsHC $GitOU)) {
                 throw "Input file '$ImportFile': GIT OU '$GitOU' does not exist."
             }
 
@@ -170,9 +170,9 @@ Begin {
                 @{N = 'Office'; E = { $_.physicalDeliveryOfficeName } },
                 @{N = 'Notes'; E = { $_.info -replace '`n', ' ' } },
                 @{N = 'LogonScript'; E = { $_.scriptPath } },
-                @{N = 'TSUserProfile'; E = { Get-AdTsProfileHC $_.DistinguishedName 'UserProfile' } },
-                @{N = 'TSHomeDirectory'; E = { Get-AdTsProfileHC $_.DistinguishedName 'HomeDirectory' } },
-                @{N = 'TSHomeDrive'; E = { Get-AdTsProfileHC $_.DistinguishedName 'HomeDrive' } }
+                @{N = 'TSUserProfile'; E = { Get-ADTsProfileHC $_.DistinguishedName 'UserProfile' } },
+                @{N = 'TSHomeDirectory'; E = { Get-ADTsProfileHC $_.DistinguishedName 'HomeDirectory' } },
+                @{N = 'TSHomeDrive'; E = { Get-ADTsProfileHC $_.DistinguishedName 'HomeDrive' } }
             )
             #endregion
         }
@@ -199,9 +199,9 @@ Begin {
                 @{N = 'Office'; E = { $_.physicalDeliveryOfficeName } },
                 @{N = 'Notes'; E = { $_.info -replace '`n', ' ' } },
                 @{N = 'LogonScript'; E = { $_.scriptPath } },
-                @{N = 'TSUserProfile'; E = { Get-AdTsProfileHC $_.DistinguishedName 'UserProfile' } },
-                @{N = 'TSHomeDirectory'; E = { Get-AdTsProfileHC $_.DistinguishedName 'HomeDirectory' } },
-                @{N = 'TSHomeDrive'; E = { Get-AdTsProfileHC $_.DistinguishedName 'HomeDrive' } }
+                @{N = 'TSUserProfile'; E = { Get-ADTsProfileHC $_.DistinguishedName 'UserProfile' } },
+                @{N = 'TSHomeDirectory'; E = { Get-ADTsProfileHC $_.DistinguishedName 'HomeDirectory' } },
+                @{N = 'TSHomeDrive'; E = { Get-ADTsProfileHC $_.DistinguishedName 'HomeDrive' } }
             }
         }
 
@@ -1012,21 +1012,30 @@ End {
         $UsersHtmlList = $ComputersHtmlList = $GroupsHtmlList =
         $GitUsersHtmlList = $GroupMembersHtmlList = @()
 
-        foreach ($A in @($AllObjects.GetEnumerator() | Sort-Object -Property { $_.Value.WorkSheetName })) {
+        foreach (
+            $A in 
+            $AllObjects.GetEnumerator() | Sort-Object { $_.Value.WorkSheetName }
+        ) {
+            #region Test missing properties
             if (-not (
                     $A.Value.ContainsKey('Data') -and
                     $A.Value.ContainsKey('PropertyToExport') -and
                     $A.Value.Description -and
                     $A.Value.WorkSheetName -and
-                    $A.Value.Type)) {
+                    $A.Value.Type)
+            ) {
                 throw "Missing a property for worksheet '$($A.Value.WorkSheetName)' with description '$($A.Value.Description)'"
             }
+            #endregion
 
             $ExcelParams.TableName = $A.Value.WorksheetName
             $ExcelParams.WorkSheetName = $A.Value.WorksheetName
 
             $HtmlListItem = '<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>' -f
-            $(if ($A.Value['Count']) { $A.Value['Count'] } else { @($A.Value.Data).Count }), 
+            $(
+                if ($A.Value['Count']) { $A.Value['Count'] } 
+                else { @($A.Value.Data).Count }
+            ), 
             $A.Value.WorksheetName, 
             $A.Value.Description
 
@@ -1163,14 +1172,14 @@ $(if($ExcludedGroups) {
         if ($error) {
             # $Error | Select-Object @{N = 'M'; E = { $_.Exception.Message + $_.ScriptStackTrace } } | Select-Object -ExpandProperty M |
             $HTMLErrors = $Error.Exception.Message | Sort-Object -Unique | 
-            ConvertTo-HTMLlistHC -Spacing Wide -Header 'Errors detected:'
+            ConvertTo-HtmlListHC -Spacing Wide -Header 'Errors detected:'
             $MailParams.Message += $HTMLErrors
 
             $MailParams.Subject = "Failure - $($error.Count) errors"
         }
 
         $MailParams.Message += $OU | ConvertTo-OuNameHC -OU | Sort-Object |
-        ConvertTo-HTMLlistHC -Header 'Organizational units:'
+        ConvertTo-HtmlListHC -Header 'Organizational units:'
 
         Remove-EmptyParamsHC -Name $MailParams
         Get-ScriptRuntimeHC -Stop
