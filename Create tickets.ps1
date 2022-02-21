@@ -23,7 +23,7 @@ Param (
     [String]$SQLTableTicketsDefaults = 'TicketsDefaults',
     [String]$SQLTableAdInconsistencies = 'AdInconsistencies',
 
-    [String]$ScriptAdmin = 'Brecht.Gijbels@heidelbergcement.com'
+    [String]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
 
 
