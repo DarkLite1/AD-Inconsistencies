@@ -44,6 +44,26 @@ Begin {
             Get-Item -LiteralPath $Leaf -EA Stop
         }
     }
+    Function Start-TicketCreationScriptHC {
+        Param (
+            [Parameter(Mandatory)]
+            [ValidateScript({ Test-Path -LiteralPath $_ })]
+            [String]$Script,
+            [Parameter(Mandatory)]
+            [String]$TopicName,
+            [Parameter(Mandatory)]
+            [PSCustomObject[]]$Data,
+            [PSCustomObject]$TicketFields
+        )
+
+        try {
+            & $Script -TopicName $TopicName -Data $Data -TicketFields $TicketFields -EA Stop
+        }
+        catch {
+            Write-Warning "Failed running script '$Script': $_"
+            $Error.RemoveAt(0)
+        }
+    }
 
     Try {
         $Error.Clear()
@@ -1123,11 +1143,14 @@ End {
             if ($A.Value.Data -and $A.Value.PropertyToExport) {
                 #region Create ticket
                 if ($createTicket) {
-                    $test = @{
-                        Name    = $A.Name
-                        Payload = $File.Tickets."$($A.Name)"
+                    $ticketParams = @{
+                        Script       = $scriptCreateTicketsItem.FullName
+                        TopicName    = $A.Name
+                        TicketFields = $File.Tickets."$($A.Name)"
+                        Data         = $A.Value.Data
                     }
-                    $File.Tickets."$($A.Name)"
+                    
+                    Start-TicketCreationScriptHC @ticketParams
                 }
                 #endregion
 

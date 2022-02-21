@@ -63,7 +63,7 @@ BeforeAll {
         ScriptName          = 'Test (Brecht)'
         ImportFile          = $testOutParams.FilePath
         LogFolder           = (New-Item "TestDrive:/log" -ItemType Directory).FullName
-        ScriptCreateTickets = New-Item 'TestDrive:/tickets.ps1' -ItemType File
+        ScriptCreateTickets = (New-Item 'TestDrive:/tickets.ps1' -ItemType File).FullName
     }
 
     Mock Send-MailHC
@@ -1687,6 +1687,19 @@ Describe 'GIT users' {
 }
 Describe "When the input file contains the parameter 'Tickets'" {
     BeforeAll {
+        Function Start-TicketCreationScriptHC {
+            Param (
+                [Parameter(Mandatory)]
+                [ValidateScript({ Test-Path -LiteralPath $_ })]
+                [String]$Script,
+                [Parameter(Mandatory)]
+                [String]$TopicName,
+                [Parameter(Mandatory)]
+                [PSCustomObject[]]$Data,
+                [PSCustomObject]$TicketFields
+            )
+        }
+        Mock Start-TicketCreationScriptHC
         Mock Get-ADComputer {
             [PSCustomObject]@{
                 Name          = 'PC1'
@@ -1714,8 +1727,8 @@ Describe "When the input file contains the parameter 'Tickets'" {
         
         $testInputFile.Tickets = @{
             'Computer - Inactive' = @{
-                shortDescription = ''
-                Description      = ''
+                shortDescription = 'a'
+                description      = 'b'
             }
         }
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
@@ -1737,6 +1750,12 @@ Describe "When the input file contains the parameter 'Tickets'" {
         }
     }
     It 'the ticket creation script is called' {
-        
+        Should -Invoke Start-TicketCreationScriptHC -Times 1 -Exactly -Scope Describe -ParameterFilter {
+            ($Script -eq $testParams.ScriptCreateTickets) -and
+            ($TopicName -eq 'Computer - Inactive') -and
+            ($TicketFields.shortDescription -eq 'a') -and
+            ($TicketFields.description -eq 'b') -and
+            ($Data.Name -eq 'PC1')
+        }
     }
-} -Tag test
+} 
