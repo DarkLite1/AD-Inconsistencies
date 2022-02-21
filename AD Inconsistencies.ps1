@@ -13,6 +13,7 @@ Param (
     [String]$ScriptName,
     [Parameter(Mandatory)]
     [String]$ImportFile,
+    [String]$ScriptCreateTickets = 'Create tickets.ps1',
     [String]$LogFolder = $env:POWERSHELL_LOG_FOLDER,
     [String]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
@@ -1085,6 +1086,15 @@ End {
             #endregion
 
             if ($A.Value.Data -and $A.Value.PropertyToExport) {
+                #region Create ticket
+                if ($createTicket) {
+                    $test = @{
+                        Name = $A.Name
+                        Payload = $File.Tickets."$($A.Name)"
+                    }
+                    $File.Tickets."$($A.Name)"
+                }
+                #endregion
 
                 #region Export to Excel file
                 Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
@@ -1096,8 +1106,6 @@ End {
                 
                 $MailParams.Attachments += $ExcelParams.Path
             }
-
-
         }
         #endregion
 

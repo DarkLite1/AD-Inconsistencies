@@ -1735,4 +1735,7 @@ Describe "When the input file contains the parameter 'Tickets'" {
             $Message -like "*<td>'Enabled' in the OU 'Disabled'</td>*"
         }
     }
+    it 'the ticket creation script is called' {
+        
+    }
 } -Tag test
