@@ -57,7 +57,7 @@ Begin {
         )
 
         try {
-            & $Script -ScriptName $ScriptName -TopicName $TopicName -DistinguishedName $DistinguishedName -TicketFields $TicketFields -EA Stop
+            & $Script -ScriptName $ScriptName -Environment 'PROD' -TopicName $TopicName -DistinguishedName $DistinguishedName -TicketFields $TicketFields -EA Stop
         }
         catch {
             Write-Warning "Failed running script '$Script': $_"

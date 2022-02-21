@@ -11,11 +11,12 @@ Param (
     [Parameter(Mandatory)]
     [String]$ScriptName,
     [Parameter(Mandatory)]
+    [String]$Environment,
+    [Parameter(Mandatory)]
     [String]$TopicName,
     [Parameter(Mandatory)]
     [String[]]$DistinguishedName,
     [PSCustomObject]$TicketFields,
-    [String]$Environment,
 
 
     [String]$SQLServerInstance = 'GRPSDFRAN0049',
