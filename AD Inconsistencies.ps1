@@ -1018,6 +1018,17 @@ End {
         ) {
             Write-Verbose "Type '$($A.Value.Type)' worksheet '$($A.Value.WorksheetName)' item '$($A.Key)' data '$(@($A.Value.Data).Count)'"
 
+            #region Create tickets
+            $createTicket = $false
+
+            if (
+                $File.Tickets | 
+                Get-Member -Name $A.Name -MemberType NoteProperty
+            ) {
+                $createTicket = $true
+            }
+            #endregion
+
             #region Test missing properties
             if (-not (
                     $A.Value.ContainsKey('Data') -and
@@ -1030,29 +1041,6 @@ End {
             }
             #endregion
 
-            $emailTableRowDescription = $A.Value.Description
-
-            if ($A.Value.Data -and $A.Value.PropertyToExport) {
-                #region Create tickets
-                if (
-                    $File.Tickets | 
-                    Get-Member -Name $A.Name -MemberType NoteProperty
-                ) {
-                    $emailTableRowDescription += ' //AUTO TICKET'
-                }
-                #endregion
-
-                #region Export to Excel file
-                Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
-                $ExcelParams.TableName = $A.Value.WorksheetName
-                $ExcelParams.WorkSheetName = $A.Value.WorksheetName
-                $A.Value.Data | Select-Object $A.Value.PropertyToExport |
-                Export-Excel @ExcelParams
-                #endregion
-                
-                $MailParams.Attachments += $ExcelParams.Path
-            }
-
             #region Create email table rows and Excel file name
             $HtmlListItem = '<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>' -f
             $(
@@ -1060,7 +1048,10 @@ End {
                 else { @($A.Value.Data).Count }
             ), 
             $A.Value.WorksheetName, 
-            $emailTableRowDescription
+            $(
+                if ($createTicket) { $A.Value.Description + ' //AUTO TICKET' }
+                else { $A.Value.Description }
+            )
 
             switch ($A.Value.Type) {
                 'User' {
@@ -1092,6 +1083,21 @@ End {
                 }
             }
             #endregion
+
+            if ($A.Value.Data -and $A.Value.PropertyToExport) {
+
+                #region Export to Excel file
+                Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
+                $ExcelParams.TableName = $A.Value.WorksheetName
+                $ExcelParams.WorkSheetName = $A.Value.WorksheetName
+                $A.Value.Data | Select-Object $A.Value.PropertyToExport |
+                Export-Excel @ExcelParams
+                #endregion
+                
+                $MailParams.Attachments += $ExcelParams.Path
+            }
+
+
         }
         #endregion
 
