@@ -1149,7 +1149,6 @@ End {
                         TicketFields      = $File.Tickets."$($A.Name)"
                         DistinguishedName = $A.Value.Data.DistinguishedName
                     }
-                    
                     Start-TicketCreationScriptHC @ticketParams
                 }
                 #endregion
