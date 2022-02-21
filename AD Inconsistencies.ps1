@@ -1006,7 +1006,7 @@ End {
         }
         #endregion
 
-        #region Export incorrect data to Excel and create HTML lists for the email
+        #region Export to Excel and email table rows
         Write-Verbose 'Export incorrect data to Excel'
 
         $UsersHtmlList = $ComputersHtmlList = $GroupsHtmlList =
@@ -1030,6 +1030,29 @@ End {
             }
             #endregion
 
+            $emailTableRowDescription = $A.Value.Description
+
+            if ($A.Value.Data -and $A.Value.PropertyToExport) {
+                #region Create tickets
+                if (
+                    $File.Tickets | 
+                    Get-Member -Name $A.Name -MemberType NoteProperty
+                ) {
+                    $emailTableRowDescription += ' //AUTO TICKET'
+                }
+                #endregion
+
+                #region Export to Excel file
+                Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
+                $ExcelParams.TableName = $A.Value.WorksheetName
+                $ExcelParams.WorkSheetName = $A.Value.WorksheetName
+                $A.Value.Data | Select-Object $A.Value.PropertyToExport |
+                Export-Excel @ExcelParams
+                #endregion
+                
+                $MailParams.Attachments += $ExcelParams.Path
+            }
+
             #region Create email table rows and Excel file name
             $HtmlListItem = '<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>' -f
             $(
@@ -1037,7 +1060,7 @@ End {
                 else { @($A.Value.Data).Count }
             ), 
             $A.Value.WorksheetName, 
-            $A.Value.Description
+            $emailTableRowDescription
 
             switch ($A.Value.Type) {
                 'User' {
@@ -1069,18 +1092,6 @@ End {
                 }
             }
             #endregion
-
-            if ($A.Value.Data -and $A.Value.PropertyToExport) {
-                #region Export to Excel file
-                Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
-                $ExcelParams.TableName = $A.Value.WorksheetName
-                $ExcelParams.WorkSheetName = $A.Value.WorksheetName
-                $A.Value.Data | Select-Object $A.Value.PropertyToExport |
-                Export-Excel @ExcelParams
-                #endregion
-                
-                $MailParams.Attachments += $ExcelParams.Path
-            }
         }
         #endregion
 
