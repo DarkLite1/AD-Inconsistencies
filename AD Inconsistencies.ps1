@@ -52,12 +52,12 @@ Begin {
             [Parameter(Mandatory)]
             [String]$TopicName,
             [Parameter(Mandatory)]
-            [PSCustomObject[]]$Data,
+            [String[]]$DistinguishedName,
             [PSCustomObject]$TicketFields
         )
 
         try {
-            & $Script -TopicName $TopicName -Data $Data -TicketFields $TicketFields -EA Stop
+            & $Script -TopicName $TopicName -DistinguishedName $DistinguishedName -TicketFields $TicketFields -EA Stop
         }
         catch {
             Write-Warning "Failed running script '$Script': $_"
@@ -1144,10 +1144,10 @@ End {
                 #region Create ticket
                 if ($createTicket) {
                     $ticketParams = @{
-                        Script       = $scriptCreateTicketsItem.FullName
-                        TopicName    = $A.Name
-                        TicketFields = $File.Tickets."$($A.Name)"
-                        Data         = $A.Value.Data
+                        Script            = $scriptCreateTicketsItem.FullName
+                        TopicName         = $A.Name
+                        TicketFields      = $File.Tickets."$($A.Name)"
+                        DistinguishedName = $A.Value.Data.DistinguishedName
                     }
                     
                     Start-TicketCreationScriptHC @ticketParams

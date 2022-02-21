@@ -1695,22 +1695,24 @@ Describe "When the input file contains the parameter 'Tickets'" {
                 [Parameter(Mandatory)]
                 [String]$TopicName,
                 [Parameter(Mandatory)]
-                [PSCustomObject[]]$Data,
+                [String[]]$DistinguishedName,
                 [PSCustomObject]$TicketFields
             )
         }
         Mock Start-TicketCreationScriptHC
         Mock Get-ADComputer {
             [PSCustomObject]@{
-                Name          = 'PC1'
-                Description   = 'Computer - Inactive'
-                CanonicalName = 'contoso.com/EU/BEL/Computers/PC'
-                Enabled       = $true
-                LastLogonDate = ($testDate).AddMonths( -3)
+                Name              = 'PC1'
+                Description       = 'Computer - Inactive'
+                DistinguishedName = 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com'
+                CanonicalName     = 'contoso.com/EU/BEL/Computers/PC'
+                Enabled           = $true
+                LastLogonDate     = ($testDate).AddMonths( -3)
             }
             [PSCustomObject]@{
                 Name          = 'PC2'
                 Description   = 'Computer - EnabledInDisabledOU'
+                DistinguishedName = 'CN=PC2,DC=Computers,OU=Disabled,OU=BEL,OU=EU,DC=contoso,DC=com'
                 CanonicalName = 'contoso.com/EU/BEL/Disabled/Computers/PC'
                 Enabled       = $true
                 LastLogonDate = ($testDate).AddMonths( -9)
@@ -1755,7 +1757,7 @@ Describe "When the input file contains the parameter 'Tickets'" {
             ($TopicName -eq 'Computer - Inactive') -and
             ($TicketFields.shortDescription -eq 'a') -and
             ($TicketFields.description -eq 'b') -and
-            ($Data.Name -eq 'PC1')
+            ($DistinguishedName -eq 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com')
         }
-    }
+    } -tag test
 } 
