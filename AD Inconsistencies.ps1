@@ -1016,6 +1016,8 @@ End {
             $A in 
             $AllObjects.GetEnumerator() | Sort-Object { $_.Value.WorkSheetName }
         ) {
+            Write-Verbose "Type '$($A.Value.Type)' worksheet '$($A.Value.WorksheetName)' item '$($A.Key)' data '$(@($A.Value.Data).Count)'"
+
             #region Test missing properties
             if (-not (
                     $A.Value.ContainsKey('Data') -and
@@ -1028,9 +1030,7 @@ End {
             }
             #endregion
 
-            $ExcelParams.TableName = $A.Value.WorksheetName
-            $ExcelParams.WorkSheetName = $A.Value.WorksheetName
-
+            #region Create email table rows and Excel file name
             $HtmlListItem = '<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>' -f
             $(
                 if ($A.Value['Count']) { $A.Value['Count'] } 
@@ -1068,11 +1068,17 @@ End {
                     throw "The custom object type '$_' is not supported. Please implement this feature."
                 }
             }
+            #endregion
 
             if ($A.Value.Data -and $A.Value.PropertyToExport) {
+                #region Export to Excel file
                 Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
+                $ExcelParams.TableName = $A.Value.WorksheetName
+                $ExcelParams.WorkSheetName = $A.Value.WorksheetName
                 $A.Value.Data | Select-Object $A.Value.PropertyToExport |
                 Export-Excel @ExcelParams
+                #endregion
+                
                 $MailParams.Attachments += $ExcelParams.Path
             }
         }

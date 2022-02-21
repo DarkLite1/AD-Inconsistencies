@@ -268,7 +268,7 @@ Describe 'Computers' {
 
         $AllObjects['Computer - Inactive'].Data.Name | 
         Should -Be @('PC1', 'PC2', 'PC3', 'PC4', 'PC5')
-    } -Tag test
+    }
     It 'enabled in OU disabled' {
         Mock Get-ADComputer {
             [PSCustomObject]@{
@@ -1683,4 +1683,58 @@ Describe 'GIT users' {
 
         $AllObjects['GitUser - NoManger'].Data.SamAccountName | Should -Be @(0..1).ForEach( { 'IncorrectUser' })
     } 
-}    
+}
+Describe "When the input file contains the parameter 'Tickets'" {
+    BeforeAll {
+        Mock Get-ADComputer {
+            [PSCustomObject]@{
+                Name          = 'PC1'
+                Description   = 'Computer - Inactive'
+                CanonicalName = 'contoso.com/EU/BEL/Computers/PC'
+                Enabled       = $true
+                LastLogonDate = ($testDate).AddMonths( -3)
+            }
+            [PSCustomObject]@{
+                Name          = 'PC2'
+                Description   = 'Computer - EnabledInDisabledOU'
+                CanonicalName = 'contoso.com/EU/BEL/Disabled/Computers/PC'
+                Enabled       = $true
+                LastLogonDate = ($testDate).AddMonths( -9)
+            }
+        }
+        Mock Get-ADGroup
+        Mock Get-ADUser
+        Mock Get-ADOrganizationalUnit {
+            [PSCustomObject]@{
+                CanonicalName = 'contoso.com/EU/BEL'
+                Description   = 'Belgium'
+            }
+        }
+        
+        $testInputFile.Tickets = @{
+            'Computer - Inactive' = @{
+                shortDescription = ''
+                Description      = ''
+            }
+        }
+        $testInputFile | ConvertTo-Json | Out-File @testOutParams
+
+        .$testScript @testParams
+
+        $AllObjects['Computer - Inactive'].Data.Name | 
+        Should -Be @('PC1')
+        $AllObjects['Computer - EnabledInDisabledOU'].Data.Name | 
+        Should -Be @('PC2')
+    }
+
+    It "the text 'AUTO TICKET' is added to the description in the e-mail" {
+        Should -Invoke Send-MailHC -Times 1 -Exactly -Scope Describe -ParameterFilter {
+            $Message -like "*<td>'LastLogonDate' over $InactiveDays days<br>(Excluding OU 'Disabled') //AUTO TICKET</td>*"
+        }
+
+        # Should -Invoke Send-MailHC -Times 1 -Exactly -Scope Describe -ParameterFilter {
+        #     $Message -like "*<td>'Enabled' in the OU 'Disabled'</td>*"
+        # }
+        
+    }
+} -Tag test
