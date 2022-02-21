@@ -60,9 +60,10 @@ BeforeAll {
 
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
     $testParams = @{
-        ScriptName = 'Test (Brecht)'
-        ImportFile = $testOutParams.FilePath
-        LogFolder  = (New-Item "TestDrive:/log" -ItemType Directory).FullName
+        ScriptName          = 'Test (Brecht)'
+        ImportFile          = $testOutParams.FilePath
+        LogFolder           = (New-Item "TestDrive:/log" -ItemType Directory).FullName
+        ScriptCreateTickets = New-Item 'TestDrive:/tickets.ps1' -ItemType File
     }
 
     Mock Send-MailHC
@@ -1735,7 +1736,7 @@ Describe "When the input file contains the parameter 'Tickets'" {
             $Message -like "*<td>'Enabled' in the OU 'Disabled'</td>*"
         }
     }
-    it 'the ticket creation script is called' {
+    It 'the ticket creation script is called' {
         
     }
 } -Tag test

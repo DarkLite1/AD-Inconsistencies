@@ -13,12 +13,38 @@ Param (
     [String]$ScriptName,
     [Parameter(Mandatory)]
     [String]$ImportFile,
-    [String]$ScriptCreateTickets = 'Create tickets.ps1',
+    [String]$ScriptCreateTicketsFile = 'Create tickets.ps1',
     [String]$LogFolder = $env:POWERSHELL_LOG_FOLDER,
     [String]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
 
 Begin {
+    Function Get-PathItemHC {
+        <#
+        .SYNOPSIS
+            Get the path item from a relative or absolute path
+
+        .DESCRIPTION
+            Perform Get-Item on a file located in a relative or absolute path
+
+        .EXAMPLE
+            Get-PathItemHC -Parent $PSScriptRoot -Leaf 'copy.ps1'
+
+            Perform Get-Item on the script 'copy.ps1' in the current directory
+        #>
+        Param (
+            [Parameter(Mandatory)]
+            [string]$Leaf,
+            $Parent = $PSScriptRoot
+        )
+        if (Test-Path -LiteralPath (Join-Path -Path $Parent -ChildPath $Leaf) -PathType Leaf) {
+            Get-Item -LiteralPath (Join-Path -Path $Parent -ChildPath $Leaf) -EA Stop
+        }
+        else {
+            Get-Item -LiteralPath $Leaf -EA Stop
+        }
+    }
+
     Try {
         $Error.Clear()
         Import-EventLogParamsHC -Source $ScriptName
@@ -62,6 +88,15 @@ Begin {
             }
 
             $GitSearchCountries = ($GitCountryCode | ForEach-Object { "(Country -EQ '$_')" }) -join ' -or '
+        }
+        #endregion
+
+        #region Create tickets file
+        Try {
+            $scriptCreateTicketsItem = Get-PathItemHC -Leaf $ScriptCreateTicketsFile
+        }
+        Catch {
+            throw "Create tickets script file '$ScriptCreateTicketsFile' not found"
         }
         #endregion
 
@@ -1024,7 +1059,7 @@ End {
 
             if (
                 $File.Tickets | 
-                Get-Member -Name $A.Name -MemberType NoteProperty
+                Get-Member -Name $A.Name -MemberType NoteProperty -EA Ignore
             ) {
                 $createTicket = $true
             }
@@ -1089,7 +1124,7 @@ End {
                 #region Create ticket
                 if ($createTicket) {
                     $test = @{
-                        Name = $A.Name
+                        Name    = $A.Name
                         Payload = $File.Tickets."$($A.Name)"
                     }
                     $File.Tickets."$($A.Name)"
