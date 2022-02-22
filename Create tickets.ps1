@@ -18,7 +18,6 @@ Param (
     [String[]]$DistinguishedName,
     [PSCustomObject]$TicketFields,
 
-
     [String]$SQLServerInstance = 'GRPSDFRAN0049',
     [String]$SQLDatabase = 'PowerShell',
     [String]$SQLTableTicketsDefaults = 'TicketsDefaults',
