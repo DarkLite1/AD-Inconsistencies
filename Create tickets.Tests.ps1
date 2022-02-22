@@ -65,7 +65,7 @@ Describe 'create no ticket when' {
     }
 }
 Describe 'create a new ticket' {
-    It 'when no ticket was created before or it was closed' {
+    BeforeAll {
         Mock Invoke-Sqlcmd2 -ParameterFilter {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
@@ -73,6 +73,17 @@ Describe 'create a new ticket' {
                 DistinguishedName = 'a'
             }
         }
+    }
+    It 'when no ticket was created before or it was closed' {
+        $testNewParams = $testParams.Clone()
+        $testNewParams.DistinguishedName = 'b'
+
+        .$testScript @testNewParams
+
+        Should -Invoke New-CherwellTicketHC -Times 1 -Exactly
+    }
+    It 'when no ticket was created before or it was closed' {
+        
 
         $testNewParams = $testParams.Clone()
         $testNewParams.DistinguishedName = 'b'
