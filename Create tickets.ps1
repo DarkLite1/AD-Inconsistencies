@@ -13,7 +13,7 @@ Param (
     [Parameter(Mandatory)]
     [String[]]$DistinguishedName,
     [PSCustomObject]$TicketFields,
-    [String]$Environment = 'PROD',
+    [String]$Environment = 'Prod',
 
     [String]$SQLServerInstance = 'GRPSDFRAN0049',
     [String]$SQLDatabase = 'PowerShell',
