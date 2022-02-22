@@ -46,3 +46,21 @@ Describe 'an error is thrown when' {
         }
     } 
 }
+Describe 'create no ticket when' {
+    It 'a ticket was already created and it is still open' {
+        Mock Invoke-Sqlcmd2 -ParameterFilter {
+            $Query -like "*FROM $SQLTableAdInconsistencies*"
+        } -MockWith {
+            [PSCustomObject]@{
+                DistinguishedName = 'a'
+            }
+        }
+
+        $testNewParams = $testParams.Clone()
+        $testNewParams.DistinguishedName = 'a'
+
+        .$testScript @testNewParams
+
+        Should -Invoke New-CherwellTicketHC -Times 0 -Exactly
+    }
+}
