@@ -71,7 +71,7 @@ Begin {
             $TicketFields.PSObject.Properties | Where-Object { $_.Value }
         ) {
             if (-not $KeyValuePair.containsKey($field.Name)) {
-                throw "Field '$($field.Name)' not found in Cherwell"
+                throw "Field name '$($field.Name)' not found in Cherwell, valid fields are '$($KeyValuePair.Keys)'"
             }
             $KeyValuePair[$field.Name] = $field.Value
         }
