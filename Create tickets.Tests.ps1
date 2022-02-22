@@ -10,7 +10,6 @@ BeforeAll {
         DistinguishedName = 'bob'
     }
 
-    Mock Get-ADGroup
     Mock New-CherwellTicketHC { 1 }
     Mock Save-TicketInSqlHC
     Mock Send-MailHC
