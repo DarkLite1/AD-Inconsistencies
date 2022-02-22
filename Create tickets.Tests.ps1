@@ -48,6 +48,22 @@ Describe 'an error is thrown when' {
             ($Message -like "*No ticket default values found*")
         }
     }
+    It 'the .json file contains unknown ticket fields' {
+        $testNewParams = $testParams.Clone()
+        $testNewParams.DistinguishedName = 'b'
+        $testNewParams.TicketFields = [PSCustomObject]@{
+            incorrectFieldName = 'x'
+        }
+        
+        .$testScript @testNewParams
+        
+        Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
+            ($EntryType -eq 'Error') -and
+            ($Message -like "*Field 'incorrectFieldName' not found*")
+        }
+
+        Should -Not -Invoke New-CherwellTicketHC
+    }
 }
 Describe 'create no ticket when' {
     It 'a ticket was already created and it is still open' {
@@ -124,6 +140,6 @@ Describe 'create a new ticket' {
                 ($KeyValuePair.SubmittedBySamAccountName -eq 'kirk') -and
                 ($KeyValuePair.ServiceCountryCode -eq 'BNL')
             }
-        } -Tag test
+        }
     }
 }

@@ -70,6 +70,9 @@ Begin {
             $field in 
             $TicketFields.PSObject.Properties | Where-Object { $_.Value }
         ) {
+            if (-not $KeyValuePair.containsKey($field.Name)) {
+                throw "Field '$($field.Name)' not found in Cherwell"
+            }
             $KeyValuePair[$field.Name] = $field.Value
         }
         #endregion
@@ -105,7 +108,7 @@ Process {
 
                 # $Description = "Please add the user '$PlaceHolderAccount'"
                 $KeyValuePair.Description = $KeyValuePair.Description += "
-                
+
                 - DistinguishedName: $Name
 
                 - Description: $TopicDescription"
