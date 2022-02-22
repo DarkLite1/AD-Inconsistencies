@@ -93,10 +93,10 @@ Describe 'create a new ticket' {
             .$testScript @testNewParams
             
             Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
-                ($KeyValuePair.Requester = 'jack') -and
-                ($KeyValuePair.SubmittedBy = 'mike') -and
-                ($KeyValuePair.ServiceCountryCode = 'BNL')
+                ($KeyValuePair.RequesterSamAccountName -eq 'jack') -and
+                ($KeyValuePair.SubmittedBySamAccountName -eq 'mike') -and
+                ($KeyValuePair.ServiceCountryCode -eq 'BNL')
             }
-        }
+        } -tag test
     }
 }
