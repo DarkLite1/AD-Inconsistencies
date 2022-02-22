@@ -9,11 +9,14 @@
 #>
 Param (
     [Parameter(Mandatory)]
+    [String]$ScriptName,
+    [Parameter(Mandatory)]
+    [String]$Environment,
+    [Parameter(Mandatory)]
     [String]$TopicName,
     [Parameter(Mandatory)]
     [String[]]$DistinguishedName,
     [PSCustomObject]$TicketFields,
-    [String]$Environment = 'Prod',
 
     [String]$SQLServerInstance = 'GRPSDFRAN0049',
     [String]$SQLDatabase = 'PowerShell',
@@ -33,7 +36,7 @@ Begin {
             ErrorAction       = 'Stop'
         }
 
-        #region Get ticket default values
+        #region Get SQL ticket default values
         $SQLTicketDefaults = Invoke-Sqlcmd2 -As PSObject @SQLParams -Query "
             SELECT *
             FROM $SQLTableTicketsDefaults
@@ -42,6 +45,10 @@ Begin {
         if (-not $SQLTicketDefaults) {
             throw "No ticket default values found in SQL table '$SQLTableTicketsDefaults' for ScriptName '$ScriptName'"
         }
+        #endregion
+
+        #region Get json file default values
+
         #endregion
     }
     Catch {

@@ -4,6 +4,7 @@
 BeforeAll {
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
     $TestParams = @{
+        ScriptName        = 'Test'
         Environment       = 'Test'
         SQLDatabase       = 'Test'
         TopicName         = 'Computer - Inactive'
@@ -19,14 +20,15 @@ BeforeAll {
         $Query -like "*FROM $SQLTableTicketsDefaults*"
     } -MockWith {
         [PSCustomObject]@{
-            Requester          = 'testScriptAccount'
+            Requester          = 'jack'
+            SubmittedBy        = 'mike'
             ServiceCountryCode = 'BNL'
         }
     }
 }
 Describe 'the mandatory parameters are' {
     It "<_>" -ForEach @(
-        'TopicName', 'DistinguishedName'
+        'ScriptName', 'Environment', 'TopicName', 'DistinguishedName'
     ) {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory | 
         Should -BeTrue
@@ -82,14 +84,19 @@ Describe 'create a new ticket' {
 
         Should -Invoke New-CherwellTicketHC -Times 1 -Exactly
     }
-    It 'when no ticket was created before or it was closed' {
-        
-
-        $testNewParams = $testParams.Clone()
-        $testNewParams.DistinguishedName = 'b'
-
-        .$testScript @testNewParams
-
-        Should -Invoke New-CherwellTicketHC -Times 1 -Exactly
+    Context 'with properties from' {
+        It 'SQL table ticketsDefaults when there are none in the .json file' {
+            $testNewParams = $testParams.Clone()
+            $testNewParams.DistinguishedName = 'b'
+            $testNewParams.TicketFields = $null
+            
+            .$testScript @testNewParams
+            
+            Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
+                ($KeyValuePair.Requester = 'jack') -and
+                ($KeyValuePair.SubmittedBy = 'mike') -and
+                ($KeyValuePair.ServiceCountryCode = 'BNL')
+            }
+        }
     }
 }
