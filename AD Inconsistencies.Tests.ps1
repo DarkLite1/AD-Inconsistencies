@@ -1762,5 +1762,5 @@ Describe "When the input file contains the parameter 'Tickets'" {
             ($TicketFields.description -eq 'b') -and
             ($DistinguishedName -eq 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com')
         }
-    } -Tag test
+    }
 } 

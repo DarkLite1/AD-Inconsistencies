@@ -57,7 +57,7 @@ Begin {
             OwnedByTeam               = $SQLTicketDefaults.OwnedByTeam
             OwnedBySamAccountName     = $SQLTicketDefaults.OwnedBy
             ShortDescription          = $SQLTicketDefaults.ShortDescription
-            Description               = $null
+            Description               = 'Please correct the following:'
             Service                   = $SQLTicketDefaults.Service
             Category                  = $SQLTicketDefaults.Category
             SubCategory               = $SQLTicketDefaults.SubCategory
@@ -68,10 +68,9 @@ Begin {
 
         foreach (
             $field in 
-            $TicketFields | Get-Member -Type Properties -EA Ignore
+            $TicketFields.PSObject.Properties | Where-Object { $_.Value }
         ) {
-            $field.Name
-            $field.Value
+            $KeyValuePair[$field.Name] = $field.Value
         }
         #endregion
     }
@@ -106,7 +105,10 @@ Process {
 
                 # $Description = "Please add the user '$PlaceHolderAccount'"
                 $KeyValuePair.Description = $KeyValuePair.Description += "
-                - DistinguishedName:  $Name"
+                
+                - DistinguishedName: $Name
+
+                - Description: $TopicDescription"
                 Remove-EmptyParamsHC -Name $KeyValuePair
 
                 $TicketParams = @{
