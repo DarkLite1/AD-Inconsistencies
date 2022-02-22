@@ -9,14 +9,11 @@
 #>
 Param (
     [Parameter(Mandatory)]
-    [String]$ScriptName,
-    [Parameter(Mandatory)]
-    [String]$Environment,
-    [Parameter(Mandatory)]
     [String]$TopicName,
     [Parameter(Mandatory)]
     [String[]]$DistinguishedName,
     [PSCustomObject]$TicketFields,
+    [String]$Environment = 'PROD',
 
     [String]$SQLServerInstance = 'GRPSDFRAN0049',
     [String]$SQLDatabase = 'PowerShell',
@@ -50,6 +47,5 @@ Begin {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
         Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"
-        Write-EventLog @EventEndParams; Exit 1
     }
 }

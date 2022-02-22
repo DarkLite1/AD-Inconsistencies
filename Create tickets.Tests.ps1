@@ -4,7 +4,6 @@
 BeforeAll {
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
     $TestParams = @{
-        ScriptName        = 'Test'
         Environment       = 'Test'
         SQLDatabase       = 'Test'
         TopicName         = 'Computer - Inactive'
@@ -28,7 +27,7 @@ BeforeAll {
 }
 Describe 'the mandatory parameters are' {
     It "<_>" -ForEach @(
-        'ScriptName', 'TopicName', 'DistinguishedName', 'Environment'
+        'TopicName', 'DistinguishedName'
     ) {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory | 
         Should -BeTrue
