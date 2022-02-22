@@ -47,7 +47,7 @@ Describe 'an error is thrown when' {
             ($EntryType -eq 'Error') -and
             ($Message -like "*No ticket default values found*")
         }
-    } 
+    }
 }
 Describe 'create no ticket when' {
     It 'a ticket was already created and it is still open' {
@@ -69,6 +69,15 @@ Describe 'create no ticket when' {
 }
 Describe 'create a new ticket' {
     BeforeAll {
+        Mock Invoke-Sqlcmd2 -ParameterFilter {
+            $Query -like "*FROM $SQLTableTicketsDefaults*"
+        } -MockWith {
+            [PSCustomObject]@{
+                Requester          = 'jack'
+                SubmittedBy        = 'mike'
+                ServiceCountryCode = 'BNL'
+            }
+        }
         Mock Invoke-Sqlcmd2 -ParameterFilter {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
@@ -96,6 +105,23 @@ Describe 'create a new ticket' {
             Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
                 ($KeyValuePair.RequesterSamAccountName -eq 'jack') -and
                 ($KeyValuePair.SubmittedBySamAccountName -eq 'mike') -and
+                ($KeyValuePair.ServiceCountryCode -eq 'BNL')
+            }
+        }
+        It 'the .json file, they overwrite the SQL ticketsDefaults' {
+            $testNewParams = $testParams.Clone()
+            $testNewParams.DistinguishedName = 'b'
+            $testNewParams.TicketFields = [PSCustomObject]@{
+                RequesterSamAccountName   = 'picard'
+                SubmittedBySamAccountName = 'kirk'
+                ServiceCountryCode        = $null
+            }
+            
+            .$testScript @testNewParams
+            
+            Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
+                ($KeyValuePair.RequesterSamAccountName -eq 'picard') -and
+                ($KeyValuePair.SubmittedBySamAccountName -eq 'kirk') -and
                 ($KeyValuePair.ServiceCountryCode -eq 'BNL')
             }
         } -Tag test
