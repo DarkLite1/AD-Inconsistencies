@@ -8,6 +8,7 @@ BeforeAll {
         Environment       = 'Test'
         SQLDatabase       = 'Test'
         TopicName         = 'Computer - Inactive'
+        TopicDescription  = "'LastLogonDate' over x days"
         DistinguishedName = 'bob'
     }
 
@@ -28,7 +29,7 @@ BeforeAll {
 }
 Describe 'the mandatory parameters are' {
     It "<_>" -ForEach @(
-        'ScriptName', 'Environment', 'TopicName', 'DistinguishedName'
+        'ScriptName', 'Environment', 'TopicName', 'TopicDescription', 'DistinguishedName'
     ) {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory | 
         Should -BeTrue
@@ -97,6 +98,6 @@ Describe 'create a new ticket' {
                 ($KeyValuePair.SubmittedBySamAccountName -eq 'mike') -and
                 ($KeyValuePair.ServiceCountryCode -eq 'BNL')
             }
-        } -tag test
+        } -Tag test
     }
 }

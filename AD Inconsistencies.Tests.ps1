@@ -1695,6 +1695,8 @@ Describe "When the input file contains the parameter 'Tickets'" {
                 [Parameter(Mandatory)]
                 [String]$TopicName,
                 [Parameter(Mandatory)]
+                [String]$TopicDescription,
+                [Parameter(Mandatory)]
                 [String[]]$DistinguishedName,
                 [PSCustomObject]$TicketFields
             )
@@ -1710,12 +1712,12 @@ Describe "When the input file contains the parameter 'Tickets'" {
                 LastLogonDate     = ($testDate).AddMonths( -3)
             }
             [PSCustomObject]@{
-                Name          = 'PC2'
-                Description   = 'Computer - EnabledInDisabledOU'
+                Name              = 'PC2'
+                Description       = 'Computer - EnabledInDisabledOU'
                 DistinguishedName = 'CN=PC2,DC=Computers,OU=Disabled,OU=BEL,OU=EU,DC=contoso,DC=com'
-                CanonicalName = 'contoso.com/EU/BEL/Disabled/Computers/PC'
-                Enabled       = $true
-                LastLogonDate = ($testDate).AddMonths( -9)
+                CanonicalName     = 'contoso.com/EU/BEL/Disabled/Computers/PC'
+                Enabled           = $true
+                LastLogonDate     = ($testDate).AddMonths( -9)
             }
         }
         Mock Get-ADGroup
@@ -1755,9 +1757,10 @@ Describe "When the input file contains the parameter 'Tickets'" {
         Should -Invoke Start-TicketCreationScriptHC -Times 1 -Exactly -Scope Describe -ParameterFilter {
             ($Script -eq $testParams.ScriptCreateTickets) -and
             ($TopicName -eq 'Computer - Inactive') -and
+            ($TopicDescription -like "'LastLogonDate' over*") -and
             ($TicketFields.shortDescription -eq 'a') -and
             ($TicketFields.description -eq 'b') -and
             ($DistinguishedName -eq 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com')
         }
-    } -tag test
+    } -Tag test
 } 

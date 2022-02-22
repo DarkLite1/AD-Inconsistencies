@@ -15,6 +15,8 @@ Param (
     [Parameter(Mandatory)]
     [String]$TopicName,
     [Parameter(Mandatory)]
+    [String]$TopicDescription,
+    [Parameter(Mandatory)]
     [String[]]$DistinguishedName,
     [PSCustomObject]$TicketFields,
 
@@ -47,8 +49,30 @@ Begin {
         }
         #endregion
 
-        #region Get json file default values
+        #region Overwrite with json file default values
+        $KeyValuePair = @{
+            ServiceCountryCode        = $SQLTicketDefaults.ServiceCountryCode
+            RequesterSamAccountName   = $SQLTicketDefaults.Requester
+            SubmittedBySamAccountName = $SQLTicketDefaults.SubmittedBy
+            OwnedByTeam               = $SQLTicketDefaults.OwnedByTeam
+            OwnedBySamAccountName     = $SQLTicketDefaults.OwnedBy
+            ShortDescription          = $SQLTicketDefaults.ShortDescription
+            Description               = $null
+            Service                   = $SQLTicketDefaults.Service
+            Category                  = $SQLTicketDefaults.Category
+            SubCategory               = $SQLTicketDefaults.SubCategory
+            Source                    = $SQLTicketDefaults.Source
+            IncidentType              = $SQLTicketDefaults.IncidentType
+            Priority                  = $SQLTicketDefaults.Priority
+        }
 
+        foreach (
+            $field in 
+            $TicketFields | Get-Member -Type Properties -EA Ignore
+        ) {
+            $field.Name
+            $field.Value
+        }
         #endregion
     }
     Catch {
@@ -80,24 +104,9 @@ Process {
 
                 $PSCode = New-PSCodeHC $SQLTicketDefaults.ServiceCountryCode
 
-                $Description = "
-                    Please add the user '$PlaceHolderAccount'"
-
-                $KeyValuePair = @{
-                    ServiceCountryCode        = $SQLTicketDefaults.ServiceCountryCode
-                    RequesterSamAccountName   = $SQLTicketDefaults.Requester
-                    SubmittedBySamAccountName = $SQLTicketDefaults.SubmittedBy
-                    OwnedByTeam               = $SQLTicketDefaults.OwnedByTeam
-                    OwnedBySamAccountName     = $SQLTicketDefaults.OwnedBy
-                    ShortDescription          = $SQLTicketDefaults.ShortDescription
-                    Description               = $Description
-                    Service                   = $SQLTicketDefaults.Service
-                    Category                  = $SQLTicketDefaults.Category
-                    SubCategory               = $SQLTicketDefaults.SubCategory
-                    Source                    = $SQLTicketDefaults.Source
-                    IncidentType              = $SQLTicketDefaults.IncidentType
-                    Priority                  = $SQLTicketDefaults.Priority
-                }
+                # $Description = "Please add the user '$PlaceHolderAccount'"
+                $KeyValuePair.Description = $KeyValuePair.Description += "
+                - DistinguishedName:  $Name"
                 Remove-EmptyParamsHC -Name $KeyValuePair
 
                 $TicketParams = @{
