@@ -34,6 +34,7 @@ Begin {
             ErrorAction       = 'Stop'
         }
 
+        #region Get ticket default values
         $SQLTicketDefaults = Invoke-Sqlcmd2 -As PSObject @SQLParams -Query "
             SELECT *
             FROM $SQLTableTicketsDefaults
@@ -42,6 +43,7 @@ Begin {
         if (-not $SQLTicketDefaults) {
             throw "No ticket default values found in SQL table '$SQLTableTicketsDefaults' for ScriptName '$ScriptName'"
         }
+        #endregion
     }
     Catch {
         Write-Warning $_
