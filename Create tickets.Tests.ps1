@@ -14,6 +14,7 @@ BeforeAll {
     Mock Get-ADGroup
     Mock New-CherwellTicketHC { 1 }
     Mock Save-TicketInSqlHC
+    Mock Send-MailHC
     Mock Write-EventLog
     Mock Invoke-Sqlcmd2
     Mock Invoke-Sqlcmd2 -ParameterFilter {
