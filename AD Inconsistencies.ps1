@@ -59,7 +59,7 @@ Begin {
         )
 
         try {
-            & $Script -ScriptName $ScriptName -Environment 'Prod' -TopicName $TopicName -DistinguishedName $DistinguishedName -TopicDescription $TopicDescription -TicketFields $TicketFields -EA Stop
+            & $Script -ScriptName $ScriptName -Environment 'Prod' -TopicName $TopicName -TopicDescription $TopicDescription -DistinguishedName $DistinguishedName -TicketFields $TicketFields -EA Stop
         }
         catch {
             Write-Warning "Failed running script '$Script': $_"
