@@ -173,10 +173,11 @@ Process {
 
                 #region Save details in SQL
                 $SaveTicketParams = @{
+                    Database     = $SQLDatabase
+                    ScriptName   = $ScriptName
                     KeyValuePair = $KeyValuePair
                     PSCode       = $PSCode
                     TicketNr     = $TicketNr
-                    ScriptName   = $ScriptName
                 }
                 Save-TicketInSqlHC @SaveTicketParams
                 
