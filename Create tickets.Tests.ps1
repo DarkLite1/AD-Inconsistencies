@@ -65,8 +65,8 @@ Describe 'an error is thrown when' {
         Should -Not -Invoke New-CherwellTicketHC
     }
 }
-Describe 'create no ticket when' {
-    It 'a ticket was already created and it is still open' {
+Describe 'create no ticket' {
+    BeforeAll {
         Mock Invoke-Sqlcmd2 -ParameterFilter {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
@@ -79,8 +79,15 @@ Describe 'create no ticket when' {
         $testNewParams.DistinguishedName = 'a'
 
         .$testScript @testNewParams
-
-        Should -Invoke New-CherwellTicketHC -Times 0 -Exactly
+    }
+    It 'when a ticket was already created and it is still open' {
+        Should -Not -Invoke New-CherwellTicketHC -Scope Describe
+    }
+    It 'and register this in the event log' {
+        Should -Invoke Write-EventLog -Times 1 -Exactly -Scope Describe -ParameterFilter {
+            ($EntryType -ne 'Error') -and
+            ($Message -like 'No ticket created')
+        }
     }
 }
 Describe 'create a new ticket' {

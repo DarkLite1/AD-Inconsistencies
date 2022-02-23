@@ -30,6 +30,10 @@ Param (
 
 Begin {
     Try {
+        $M = "TopicName '$TopicName' TopicDescription '$TopicDescription'"
+        Write-Verbose $M
+        Write-EventLog @EventVerboseParams -Message $M
+
         $SQLParams = @{
             ServerInstance    = $SQLServerInstance
             Database          = $SQLDatabase
@@ -76,6 +80,20 @@ Begin {
             $KeyValuePair[$field.Name] = $field.Value
         }
         #endregion
+
+        #region Get open tickets
+        $openTickets = Invoke-Sqlcmd2 @SQLParams -As PSObject -Query "
+            SELECT DistinguishedName
+            FROM $SQLTableAdInconsistencies
+            WHERE 
+                TopicName = '$TopicName' AND 
+                TicketRequestedDate IS NOT NULL AND 
+                TicketCloseDate IS NULL"
+
+        $M = "Found $($openTickets.count) open tickets"
+        Write-Verbose $M
+        Write-EventLog @EventVerboseParams -Message $M
+        #endregion
     }
     Catch {
         Write-Warning $_
@@ -86,21 +104,16 @@ Begin {
 
 Process {
     Try {
-        $openTickets = Invoke-Sqlcmd2 @SQLParams -As PSObject -Query "
-            SELECT DistinguishedName
-            FROM $SQLTableAdInconsistencies
-            WHERE 
-                TopicName = '$TopicName' AND 
-                TicketRequestedDate IS NOT NULL AND 
-                TicketCloseDate IS NULL"
-
+        $PSCode = $null
+        
         Foreach (
             $Name in 
             $DistinguishedName | 
             Where-Object { $openTickets.DistinguishedName -notContains $_ }
         ) {
             Try {
-                $M = "Create ticket for TopicName '$TopicName' DistinguishedName '$Name'"
+                #region Create ticket
+                $M = "Create ticket for '$Name'"
                 Write-Verbose $M
                 Write-EventLog @EventVerboseParams -Message $M
 
@@ -121,7 +134,9 @@ Process {
                 $TicketNr = New-CherwellTicketHC @TicketParams
 
                 Write-EventLog @EventOutParams -Message "Created ticket '$TicketNr'"
+                #endregion
 
+                #region Save details in SQL
                 $SaveTicketParams = @{
                     KeyValuePair = $KeyValuePair
                     PSCode       = $PSCode
@@ -136,15 +151,23 @@ Process {
                     TicketRequestedDate, TicketNr)
                     VALUES('$PSCode', '$Name', '$TopicName', 
                     $(FSQL $Now), '$TicketNr')"
+                #endregion
             }
             Catch {
                 throw "Failed creating a ticket for TopicName '$TopicName' DistinguishedName '$Name': $_"
             }
+        }
+
+        if (-not $PSCode) {
+            $M = 'No ticket created'
+            Write-Verbose $M
+            Write-EventLog @EventVerboseParams -Message $M
         }
     }
     Catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
         Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"
+        $Error.RemoveAt(0); $Error.RemoveAt(0)
     }
 }
