@@ -7,6 +7,7 @@
         distinguished name. Only create a new ticket when there is no ticket
         yet in the database or when the previous ticket has been closed.
 #>
+[CmdLetBinding()]
 Param (
     [Parameter(Mandatory)]
     [String]$ScriptName,
@@ -105,7 +106,7 @@ Begin {
 Process {
     Try {
         $PSCode = $null
-        
+
         Foreach (
             $Name in 
             $DistinguishedName | 
