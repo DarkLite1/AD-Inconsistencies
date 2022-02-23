@@ -6,6 +6,38 @@
         Check if a ticket is already created for a specific topic and
         distinguished name. Only create a new ticket when there is no ticket
         yet in the database or when the previous ticket has been closed.
+
+    .EXAMPLE
+        $params = @{
+            ScriptName        = 'AD Inconsistencies (BNL)'
+            Environment       = 'Stage'
+            SQLDatabase       = 'Powershell TEST'
+            TopicName         = 'Computer - Inactive'
+            TopicDescription  = 'LastLogonDate over 40 days'
+            Data = @(
+                [PSCustomObject]@{
+                    Name              = "Bob Lee Swagger"
+                    DistinguishedName = "CN=Swagger\, Bob Lee,OU=Users,DC=contoso,DC=net"
+                },
+                [PSCustomObject]@{
+                    Name              = "Chuck Norris"
+                    DistinguishedName = "CN=Norris\, Chuck,OU=Users,DC=contoso,DC=net"
+                }
+            ) 
+            TicketFields      = (
+                [PSCustomObject]@{
+                    ShortDescription          = 'AD Inconsistency: Vendor account not expiring'
+                    Description               = 'Please set the expiration date within 1 year'
+                    RequesterSamAccountName   = 'bob'
+                    SubmittedBySamAccountName = 'jack'
+                    ServiceCountryCode        = 'USA'
+                }
+            )
+        }
+        & $script @params
+
+        Create tickets for Bob Lee Swagger and Chuck Norris in case there aren't
+        any tickets created yet for them with the issue 'Computer - Inactive'.
 #>
 [CmdLetBinding()]
 Param (
@@ -18,7 +50,7 @@ Param (
     [Parameter(Mandatory)]
     [String]$TopicDescription,
     [Parameter(Mandatory)]
-    [String[]]$DistinguishedName,
+    [PSCustomObject[]]$Data,
     [PSCustomObject]$TicketFields,
 
     [String]$SQLServerInstance = 'GRPSDFRAN0049',
@@ -106,25 +138,27 @@ Begin {
 Process {
     Try {
         $PSCode = $null
-
+        $ticketDescription = $KeyValuePair.Description
         Foreach (
-            $Name in 
-            $DistinguishedName | 
-            Where-Object { $openTickets.DistinguishedName -notContains $_ }
+            $D in 
+            $Data | Where-Object { 
+                $openTickets.DistinguishedName -notContains $_.DistinguishedName 
+            }
         ) {
             Try {
                 #region Create ticket
-                $M = "Create ticket for '$Name'"
+                $M = "Create ticket for '$($D.Name)'"
                 Write-Verbose $M
                 Write-EventLog @EventVerboseParams -Message $M
 
                 $PSCode = New-PSCodeHC $SQLTicketDefaults.ServiceCountryCode
 
-                $KeyValuePair.Description = $KeyValuePair.Description += "
-
-                - DistinguishedName: $Name
-
-                - Description: $TopicDescription"
+                $KeyValuePair.Description = $ticketDescription + "
+                <br><br>
+                $TopicDescription
+                <br><br>
+                <b>$($D.Name)</b>
+                <b>$($D.DistinguishedName)</b>"
                 Remove-EmptyParamsHC -Name $KeyValuePair
 
                 $TicketParams = @{
@@ -150,12 +184,13 @@ Process {
                     INSERT INTO $SQLTableAdInconsistencies
                     (PSCode, DistinguishedName, TopicName, 
                     TicketRequestedDate, TicketNr)
-                    VALUES('$PSCode', '$Name', '$TopicName', 
-                    $(FSQL $Now), '$TicketNr')"
+                    VALUES(
+                    '$PSCode', $(FSQL $D.DistinguishedName), 
+                    $(FSQL $TopicName), $(FSQL $Now), '$TicketNr')"
                 #endregion
             }
             Catch {
-                throw "Failed creating a ticket for TopicName '$TopicName' DistinguishedName '$Name': $_"
+                throw "Failed creating a ticket for TopicName '$TopicName' DistinguishedName '$($_.Name)': $_"
             }
         }
 

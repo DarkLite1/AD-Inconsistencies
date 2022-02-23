@@ -1697,7 +1697,7 @@ Describe "When the input file contains the parameter 'Tickets'" {
                 [Parameter(Mandatory)]
                 [String]$TopicDescription,
                 [Parameter(Mandatory)]
-                [String[]]$DistinguishedName,
+                [PSCustomObject[]]$Data,
                 [PSCustomObject]$TicketFields
             )
         }
@@ -1760,7 +1760,8 @@ Describe "When the input file contains the parameter 'Tickets'" {
             ($TopicDescription -like "'LastLogonDate' over*") -and
             ($TicketFields.shortDescription -eq 'a') -and
             ($TicketFields.description -eq 'b') -and
-            ($DistinguishedName -eq 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com')
+            ($Data.DistinguishedName -eq 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com') -and
+            ($Data.Name -eq 'PC1')
         }
     }
-} 
+} -tag test

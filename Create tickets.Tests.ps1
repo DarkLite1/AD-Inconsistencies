@@ -4,12 +4,17 @@
 BeforeAll {
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
     $TestParams = @{
-        ScriptName        = 'Test'
-        Environment       = 'Test'
-        SQLDatabase       = 'Test'
-        TopicName         = 'Computer - Inactive'
-        TopicDescription  = "'LastLogonDate' over x days"
-        DistinguishedName = 'bob'
+        ScriptName       = 'Test'
+        Environment      = 'Test'
+        SQLDatabase      = 'Test'
+        TopicName        = 'Computer - Inactive'
+        TopicDescription = "'LastLogonDate' over x days"
+        Data             = @(
+            [PSCustomObject]@{
+                Name              = 'bob'
+                DistinguishedName = 'DC=bob,CN=contoso,CN=net'
+            }
+        )
     }
 
     Mock New-CherwellTicketHC { 1 }
@@ -29,7 +34,7 @@ BeforeAll {
 }
 Describe 'the mandatory parameters are' {
     It "<_>" -ForEach @(
-        'ScriptName', 'Environment', 'TopicName', 'TopicDescription', 'DistinguishedName'
+        'ScriptName', 'Environment', 'TopicName', 'TopicDescription', 'Data'
     ) {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory | 
         Should -BeTrue
@@ -50,7 +55,12 @@ Describe 'an error is thrown when' {
     }
     It 'the .json file contains unknown ticket fields' {
         $testNewParams = $testParams.Clone()
-        $testNewParams.DistinguishedName = 'b'
+        $testNewParams.Data = @(
+            [PSCustomObject]@{
+                Name              = 'jack'
+                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+            }
+        )
         $testNewParams.TicketFields = [PSCustomObject]@{
             incorrectFieldName = 'x'
         }
@@ -71,12 +81,17 @@ Describe 'create no ticket' {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
             [PSCustomObject]@{
-                DistinguishedName = 'a'
+                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
             }
         }
 
         $testNewParams = $testParams.Clone()
-        $testNewParams.DistinguishedName = 'a'
+        $testNewParams.Data = @(
+            [PSCustomObject]@{
+                Name              = 'jack'
+                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+            }
+        )
 
         .$testScript @testNewParams
     }
@@ -105,13 +120,18 @@ Describe 'create a new ticket' {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
             [PSCustomObject]@{
-                DistinguishedName = 'a'
+                DistinguishedName = 'DC=chuck,CN=contoso,CN=net'
             }
         }
     }
     It 'when no ticket was created before or it was closed' {
         $testNewParams = $testParams.Clone()
-        $testNewParams.DistinguishedName = 'b'
+        $testNewParams.Data = @(
+            [PSCustomObject]@{
+                Name              = 'jack'
+                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+            }
+        )
 
         .$testScript @testNewParams
 
@@ -120,7 +140,12 @@ Describe 'create a new ticket' {
     Context 'with properties from' {
         It 'SQL table ticketsDefaults when there are none in the .json file' {
             $testNewParams = $testParams.Clone()
-            $testNewParams.DistinguishedName = 'b'
+            $testNewParams.Data = @(
+                [PSCustomObject]@{
+                    Name              = 'jack'
+                    DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+                }
+            )
             $testNewParams.TicketFields = $null
             
             .$testScript @testNewParams
@@ -133,7 +158,12 @@ Describe 'create a new ticket' {
         }
         It 'the .json file, they overwrite the SQL ticketsDefaults' {
             $testNewParams = $testParams.Clone()
-            $testNewParams.DistinguishedName = 'b'
+            $testNewParams.Data = @(
+                [PSCustomObject]@{
+                    Name              = 'jack'
+                    DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+                }
+            )
             $testNewParams.TicketFields = [PSCustomObject]@{
                 RequesterSamAccountName   = 'picard'
                 SubmittedBySamAccountName = 'kirk'
