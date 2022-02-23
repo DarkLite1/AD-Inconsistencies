@@ -106,7 +106,6 @@ Process {
 
                 $PSCode = New-PSCodeHC $SQLTicketDefaults.ServiceCountryCode
 
-                # $Description = "Please add the user '$PlaceHolderAccount'"
                 $KeyValuePair.Description = $KeyValuePair.Description += "
 
                 - DistinguishedName: $Name
