@@ -63,7 +63,6 @@ Begin {
         }
         catch {
             Write-Warning "Failed running script '$Script': $_"
-            $Error.RemoveAt(0)
         }
     }
 
