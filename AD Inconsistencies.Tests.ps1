@@ -1705,8 +1705,8 @@ Describe "When the input file contains the parameter 'Tickets'" {
         Mock Get-ADComputer {
             [PSCustomObject]@{
                 Name              = 'PC1'
+                SamAccountName    = 'PC1$'
                 Description       = 'Computer - Inactive'
-                DistinguishedName = 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com'
                 CanonicalName     = 'contoso.com/EU/BEL/Computers/PC'
                 Enabled           = $true
                 LastLogonDate     = ($testDate).AddMonths( -3)
@@ -1760,8 +1760,8 @@ Describe "When the input file contains the parameter 'Tickets'" {
             ($TopicDescription -like "'LastLogonDate' over*") -and
             ($TicketFields.shortDescription -eq 'a') -and
             ($TicketFields.description -eq 'b') -and
-            ($Data.DistinguishedName -eq 'CN=PC1,DC=Computers,OU=BEL,OU=EU,DC=contoso,DC=com') -and
+            ($Data.SamAccountName -eq 'PC1$') -and
             ($Data.Name -eq 'PC1')
         }
     }
-} -tag test
+}

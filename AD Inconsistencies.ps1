@@ -1144,7 +1144,13 @@ End {
                         TopicName        = $A.Name
                         TopicDescription = $A.Value.Description
                         TicketFields     = $File.Tickets."$($A.Name)"
-                        Data             = $A.Value.Data
+                        Data             = $A.Value.Data | Select-Object (
+                            @('SamAccountName') +
+                            (
+                                $A.Value.PropertyToExport | 
+                                Where-Object { $_ -ne 'SamAccountName' }
+                            )
+                        )
                     }
                     Start-TicketCreationScriptHC @ticketParams
                 }

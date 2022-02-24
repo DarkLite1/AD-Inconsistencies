@@ -16,24 +16,32 @@
             TopicDescription  = 'LastLogonDate over 40 days'
             Data = @(
                 [PSCustomObject]@{
-                    Name           = 'Bob Lee Swagger'
-                    SamAccountName = 'swagger'
+                    Name                  = 'Bob Lee Swagger'
+                    SamAccountName        = 'swagger'
+                    DisplayName           = 'Bob Lee Swagger'
+                    AccountExpirationDate = (Get-Date).AddYears(-2)
+                    EmployeeType          = 'Sniper'
+                    ManagerDisplayName    = ''
+                    OU                    = 'contoso.com\USA\Users'
                 },
                 [PSCustomObject]@{
-                    Name           = 'Chuck Norris'
-                    SamAccountName = 'norris'
+                    Name                  = 'Chuck Norris'
+                    SamAccountName        = 'norris'
+                    DisplayName           = 'Chuck Norris'
+                    AccountExpirationDate = (Get-Date).AddYears(-3)
+                    EmployeeType          = 'Actor'
+                    ManagerDisplayName    = ''
+                    OU                    = 'contoso.com\USA\Users\actors\hero'
                 }
             ) 
             TicketFields      = (
                 [PSCustomObject]@{
                     ShortDescription          = 'AD Inconsistency: Vendor account not expiring'
                     Description               = 'Please set the expiration date within 1 year'
-                    SubmittedBySamAccountName = 'gijbelsb'
+                    SubmittedBySamAccountName = 'bob'
                 }
             )
         }
-        & 'T:\Test\Brecht\PowerShell\AD Inconsistencies\Create tickets.ps1' @params
-
         & $script @params
 
         Create tickets for Bob Lee Swagger and Chuck Norris in case there aren't
@@ -158,8 +166,14 @@ Process {
                 <br><br>
                 $TopicDescription
                 <br><br>
-                <b>$($D.Name)</b>
-                <b>$($D.SamAccountName)</b>"
+                <table style=`"border:none`">
+                $($D.PSObject.Properties | ForEach-Object {
+                    '<tr style="border:none;text-align:left;">
+                        <th style="border:none;width:62px;color:lightGray;">{0}</th>
+                        <td style="border:none;"><b>{1}</b></td>
+                    </tr>' -f $_.Name, $_.Value
+                })
+                </table>"
                 Remove-EmptyParamsHC -Name $KeyValuePair
 
                 $TicketParams = @{
