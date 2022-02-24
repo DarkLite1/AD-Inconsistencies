@@ -115,27 +115,20 @@ Describe 'create a new ticket' {
                 SamAccountName = 'PC1'
             }
         }
-    }
-    It 'when no ticket was created before or it was closed' {
         $testNewParams = $testParams.Clone()
         $testNewParams.Data = @(
             [PSCustomObject]@{
                 SamAccountName = 'PC2'
             }
         )
-
+    }
+    It 'when no ticket was created before or it was closed' {
         .$testScript @testNewParams
 
         Should -Invoke New-CherwellTicketHC -Times 1 -Exactly
     }
     Context 'with properties from' {
         It 'SQL table ticketsDefaults when there are none in the .json file' {
-            $testNewParams = $testParams.Clone()
-            $testNewParams.Data = @(
-                [PSCustomObject]@{
-                    SamAccountName = 'PC2'
-                }
-            )
             $testNewParams.TicketFields = $null
             
             .$testScript @testNewParams
@@ -147,12 +140,6 @@ Describe 'create a new ticket' {
             }
         }
         It 'the .json file, they overwrite the SQL ticketsDefaults' {
-            $testNewParams = $testParams.Clone()
-            $testNewParams.Data = @(
-                [PSCustomObject]@{
-                    SamAccountName = 'PC2'
-                }
-            )
             $testNewParams.TicketFields = [PSCustomObject]@{
                 RequesterSamAccountName   = 'picard'
                 SubmittedBySamAccountName = 'kirk'
