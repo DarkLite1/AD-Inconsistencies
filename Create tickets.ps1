@@ -16,12 +16,12 @@
             TopicDescription  = 'LastLogonDate over 40 days'
             Data = @(
                 [PSCustomObject]@{
-                    Name              = "Bob Lee Swagger"
-                    DistinguishedName = "CN=Swagger\, Bob Lee,OU=Users,DC=contoso,DC=net"
+                    Name           = 'Bob Lee Swagger'
+                    SamAccountName = 'swagger'
                 },
                 [PSCustomObject]@{
-                    Name              = "Chuck Norris"
-                    DistinguishedName = "CN=Norris\, Chuck,OU=Users,DC=contoso,DC=net"
+                    Name           = 'Chuck Norris'
+                    SamAccountName = 'norris'
                 }
             ) 
             TicketFields      = (
@@ -116,7 +116,7 @@ Begin {
 
         #region Get open tickets
         $openTickets = Invoke-Sqlcmd2 @SQLParams -As PSObject -Query "
-            SELECT DistinguishedName
+            SELECT SamAccountName
             FROM $SQLTableAdInconsistencies
             WHERE 
                 TopicName = '$TopicName' AND 
@@ -142,7 +142,7 @@ Process {
         Foreach (
             $D in 
             $Data | Where-Object { 
-                $openTickets.DistinguishedName -notContains $_.DistinguishedName 
+                $openTickets.SamAccountName -notContains $_.SamAccountName 
             }
         ) {
             Try {
@@ -158,7 +158,7 @@ Process {
                 $TopicDescription
                 <br><br>
                 <b>$($D.Name)</b>
-                <b>$($D.DistinguishedName)</b>"
+                <b>$($D.SamAccountName)</b>"
                 Remove-EmptyParamsHC -Name $KeyValuePair
 
                 $TicketParams = @{
@@ -183,15 +183,15 @@ Process {
                 
                 Invoke-Sqlcmd2 @SQLParams -Query "
                     INSERT INTO $SQLTableAdInconsistencies
-                    (PSCode, DistinguishedName, TopicName, 
+                    (PSCode, SamAccountName, TopicName, 
                     TicketRequestedDate, TicketNr)
                     VALUES(
-                    '$PSCode', $(FSQL $D.DistinguishedName), 
+                    '$PSCode', $(FSQL $D.SamAccountName), 
                     $(FSQL $TopicName), $(FSQL $Now), '$TicketNr')"
                 #endregion
             }
             Catch {
-                throw "Failed creating a ticket for TopicName '$TopicName' DistinguishedName '$($_.Name)': $_"
+                throw "Failed creating a ticket for TopicName '$TopicName' SamAccountName '$($_.Name)': $_"
             }
         }
 

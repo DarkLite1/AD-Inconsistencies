@@ -11,8 +11,7 @@ BeforeAll {
         TopicDescription = "'LastLogonDate' over x days"
         Data             = @(
             [PSCustomObject]@{
-                Name              = 'bob'
-                DistinguishedName = 'DC=bob,CN=contoso,CN=net'
+                SamAccountName = 'PC1'
             }
         )
     }
@@ -55,12 +54,6 @@ Describe 'an error is thrown when' {
     }
     It 'the .json file contains unknown ticket fields' {
         $testNewParams = $testParams.Clone()
-        $testNewParams.Data = @(
-            [PSCustomObject]@{
-                Name              = 'jack'
-                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
-            }
-        )
         $testNewParams.TicketFields = [PSCustomObject]@{
             incorrectFieldName = 'x'
         }
@@ -81,15 +74,14 @@ Describe 'create no ticket' {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
             [PSCustomObject]@{
-                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+                SamAccountName = 'PC1'
             }
         }
 
         $testNewParams = $testParams.Clone()
         $testNewParams.Data = @(
             [PSCustomObject]@{
-                Name              = 'jack'
-                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+                SamAccountName = 'PC1'
             }
         )
 
@@ -120,7 +112,7 @@ Describe 'create a new ticket' {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
             [PSCustomObject]@{
-                DistinguishedName = 'DC=chuck,CN=contoso,CN=net'
+                SamAccountName = 'PC1'
             }
         }
     }
@@ -128,8 +120,7 @@ Describe 'create a new ticket' {
         $testNewParams = $testParams.Clone()
         $testNewParams.Data = @(
             [PSCustomObject]@{
-                Name              = 'jack'
-                DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+                SamAccountName = 'PC2'
             }
         )
 
@@ -142,8 +133,7 @@ Describe 'create a new ticket' {
             $testNewParams = $testParams.Clone()
             $testNewParams.Data = @(
                 [PSCustomObject]@{
-                    Name              = 'jack'
-                    DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+                    SamAccountName = 'PC2'
                 }
             )
             $testNewParams.TicketFields = $null
@@ -160,8 +150,7 @@ Describe 'create a new ticket' {
             $testNewParams = $testParams.Clone()
             $testNewParams.Data = @(
                 [PSCustomObject]@{
-                    Name              = 'jack'
-                    DistinguishedName = 'DC=jack,CN=contoso,CN=net'
+                    SamAccountName = 'PC2'
                 }
             )
             $testNewParams.TicketFields = [PSCustomObject]@{
