@@ -28,12 +28,12 @@
                 [PSCustomObject]@{
                     ShortDescription          = 'AD Inconsistency: Vendor account not expiring'
                     Description               = 'Please set the expiration date within 1 year'
-                    RequesterSamAccountName   = 'bob'
-                    SubmittedBySamAccountName = 'jack'
-                    ServiceCountryCode        = 'USA'
+                    SubmittedBySamAccountName = 'gijbelsb'
                 }
             )
         }
+        & 'T:\Test\Brecht\PowerShell\AD Inconsistencies\Create tickets.ps1' @params
+
         & $script @params
 
         Create tickets for Bob Lee Swagger and Chuck Norris in case there aren't
@@ -52,6 +52,7 @@ Param (
     [Parameter(Mandatory)]
     [PSCustomObject[]]$Data,
     [PSCustomObject]$TicketFields,
+    [DateTime]$TicketRequestedDate = (Get-Date),
 
     [String]$SQLServerInstance = 'GRPSDFRAN0049',
     [String]$SQLDatabase = 'PowerShell',
@@ -187,7 +188,7 @@ Process {
                     TicketRequestedDate, TicketNr)
                     VALUES(
                     '$PSCode', $(FSQL $D.SamAccountName), 
-                    $(FSQL $TopicName), $(FSQL $Now), '$TicketNr')"
+                    $(FSQL $TopicName), $(FSQL $TicketRequestedDate), '$TicketNr')"
                 #endregion
             }
             Catch {

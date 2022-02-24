@@ -58,7 +58,7 @@ Begin {
             [PSCustomObject]$TicketFields
         )
 
-        & $Script -ScriptName $ScriptName -Environment 'Prod' -TopicName $TopicName -TopicDescription $TopicDescription -Data $Data -TicketFields $TicketFields
+        & $Script -ScriptName $ScriptName -Environment 'Prod' -TopicName $TopicName -TopicDescription $TopicDescription -Data $Data -TicketFields $TicketFields -TicketRequestedDate $Now
     }
 
     Try {
