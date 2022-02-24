@@ -1150,8 +1150,7 @@ End {
                         TopicName        = $A.Name
                         TopicDescription = $A.Value.Description
                         TicketFields     = $File.Tickets."$($A.Name)"
-                        Data             = $A.Value.Data | 
-                        Select-Object -Property 'Name', 'DistinguishedName'
+                        Data             = $A.Value.Data
                     }
                     Start-TicketCreationScriptHC @ticketParams
                 }
