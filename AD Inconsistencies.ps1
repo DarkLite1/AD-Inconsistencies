@@ -58,12 +58,7 @@ Begin {
             [PSCustomObject]$TicketFields
         )
 
-        try {
-            & $Script -ScriptName $ScriptName -Environment 'Prod' -TopicName $TopicName -TopicDescription $TopicDescription -Data $Data -TicketFields $TicketFields -EA Stop
-        }
-        catch {
-            Write-Warning "Failed running script '$Script': $_"
-        }
+        & $Script -ScriptName $ScriptName -Environment 'Prod' -TopicName $TopicName -TopicDescription $TopicDescription -Data $Data -TicketFields $TicketFields
     }
 
     Try {
