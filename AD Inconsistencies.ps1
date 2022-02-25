@@ -1076,18 +1076,18 @@ Process {
 
 End {
     Try {
+        $MailParams = @{
+            Attachments = @()
+        }
+
+        $ExcelParams = @{
+            Path         = "$LogFile - Source data.xlsx"
+            AutoSize     = $true
+            FreezeTopRow = $true
+        }
+
         if (-not $NoEmail) {
             #region Export source data to Excel
-            $MailParams = @{
-                Attachments = @()
-            }
-
-            $ExcelParams = @{
-                Path         = "$LogFile - Source data.xlsx"
-                AutoSize     = $true
-                FreezeTopRow = $true
-            }
-
             Write-Verbose "Export source data to Excel file '$($ExcelParams.Path)'"
 
             $MailParams.Attachments += $ExcelParams.Path

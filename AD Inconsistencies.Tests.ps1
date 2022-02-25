@@ -1685,6 +1685,33 @@ Describe 'GIT users' {
         $AllObjects['GitUser - NoManger'].Data.SamAccountName | Should -Be @(0..1).ForEach( { 'IncorrectUser' })
     } 
 }
+Describe 'an e-mail' {
+    BeforeAll {
+        Mock Get-ADGroup
+        Mock Get-ADUser
+        Mock Get-ADOrganizationalUnit {
+            [PSCustomObject]@{
+                CanonicalName = 'contoso.com/EU/BEL'
+                Description   = 'Belgium'
+            }
+        }
+        
+        $testInputFile | ConvertTo-Json | Out-File @testOutParams
+    }
+    It 'is sent when NoMEmail is not used' {
+        .$testScript @testParams
+
+        Should -Invoke Send-MailHC -Times 1 -Exactly -ParameterFilter {
+            ($Priority -eq 'Normal') -and
+            ($To -eq $MailTo)
+        }
+    }
+    It 'is not sent when NoMEmail is used' {
+        .$testScript @testParams -NoEmail
+
+        Should -Not -Invoke Send-MailHC
+    } 
+}
 Describe "When the input file contains the parameter 'Tickets'" {
     BeforeAll {
         Function Start-TicketCreationScriptHC {
@@ -1704,12 +1731,12 @@ Describe "When the input file contains the parameter 'Tickets'" {
         Mock Start-TicketCreationScriptHC
         Mock Get-ADComputer {
             [PSCustomObject]@{
-                Name              = 'PC1'
-                SamAccountName    = 'PC1$'
-                Description       = 'Computer - Inactive'
-                CanonicalName     = 'contoso.com/EU/BEL/Computers/PC'
-                Enabled           = $true
-                LastLogonDate     = ($testDate).AddMonths( -3)
+                Name           = 'PC1'
+                SamAccountName = 'PC1$'
+                Description    = 'Computer - Inactive'
+                CanonicalName  = 'contoso.com/EU/BEL/Computers/PC'
+                Enabled        = $true
+                LastLogonDate  = ($testDate).AddMonths( -3)
             }
             [PSCustomObject]@{
                 Name              = 'PC2'
