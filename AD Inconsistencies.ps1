@@ -463,7 +463,7 @@ Process {
         #region Group members
         foreach ($G in $GroupMembers) {
             Write-Verbose "Get group member list '$G'"
-            $AllObjects["GroupMembers - $G"] = @{
+            $AllObjects["GroupMembers - $($G.Name)"] = @{
                 Description      = "List of group members"
                 WorksheetName    = $G.Name
                 PropertyToExport = 'SamAccountName', 'Name', 'Enabled', 'Description', 'LastLogonDate',
