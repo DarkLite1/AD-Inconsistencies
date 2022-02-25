@@ -156,10 +156,6 @@ Process {
         ) {
             Try {
                 #region Create ticket
-                $M = "Create ticket for '$($D.Name)'"
-                Write-Verbose $M
-                Write-EventLog @EventVerboseParams -Message $M
-
                 $PSCode = New-PSCodeHC $SQLTicketDefaults.ServiceCountryCode
 
                 $KeyValuePair.Description = $ticketDescription + "
@@ -183,7 +179,7 @@ Process {
                 }
                 $TicketNr = New-CherwellTicketHC @TicketParams
 
-                Write-EventLog @EventOutParams -Message "Created ticket '$TicketNr'"
+                Write-EventLog @EventOutParams -Message "Created ticket '$TicketNr' for '$($D.SamAccountName)' with short description '$($KeyValuePair.ShortDescription)'"
                 #endregion
 
                 #region Save details in SQL
