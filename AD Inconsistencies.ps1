@@ -54,6 +54,12 @@
         File name or path of the script that creates the tickets and saves
         the details in the SQL database.
 
+    .PARAMETER NoEmail
+        When 'NoEmail' is used then the report will not be mailed to the
+        addresses in MailTo. 
+        
+        This can be useful in case the script needs to run every day to create 
+        the required tickets, but there's no need to send a report by mail every day.
 #>
 
 Param (
