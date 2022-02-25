@@ -8,7 +8,7 @@
         Script to check the active directory for inconsistencies and violations against the BNL Naming convention.
 
     .PARAMETER ImportFile
-        A .json file containing the script arguments
+        A .json file containing the script arguments.
 
         When the key 'Tickets' is used, a ticket will be created for that 
         specific topic. 
@@ -49,6 +49,10 @@
                 }
             }
         }
+
+    .PARAMETER ScriptCreateTicketsFile
+        File name or path of the script that creates the tickets and saves
+        the details in the SQL database.
 
 #>
 
