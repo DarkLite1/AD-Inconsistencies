@@ -1070,17 +1070,6 @@ End {
         ) {
             Write-Verbose "Type '$($A.Value.Type)' worksheet '$($A.Value.WorksheetName)' item '$($A.Key)' data '$(@($A.Value.Data).Count)'"
 
-            #region Create tickets
-            $createTicket = $false
-
-            if (
-                $File.Tickets | 
-                Get-Member -Name $A.Name -MemberType NoteProperty -EA Ignore
-            ) {
-                $createTicket = $true
-            }
-            #endregion
-
             #region Test missing properties
             if (-not (
                     $A.Value.ContainsKey('Data') -and
@@ -1090,6 +1079,17 @@ End {
                     $A.Value.Type)
             ) {
                 throw "Missing a property for worksheet '$($A.Value.WorkSheetName)' with description '$($A.Value.Description)'"
+            }
+            #endregion
+
+            #region Create tickets
+            $createTicket = $false
+
+            if (
+                $File.Tickets | 
+                Get-Member -Name $A.Name -MemberType NoteProperty -EA Ignore
+            ) {
+                $createTicket = $true
             }
             #endregion
 
