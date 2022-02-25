@@ -202,7 +202,7 @@ Begin {
             #endregion
 
             #region Get all AD computers
-            $M = "OU '$O' - Get all AD computers "
+            $M = "Get all computers in OU '$O'"
             Write-Verbose $M
             Write-EventLog @EventVerboseParams -Message $M
 
@@ -215,7 +215,7 @@ Begin {
             #endregion
 
             #region Get all AD groups
-            $M = "OU '$O' - Get all AD groups"
+            $M = "Get all groups in OU '$O'"
             Write-Verbose $M
             Write-EventLog @EventVerboseParams -Message $M
 
@@ -264,7 +264,7 @@ Begin {
             #endregion
 
             #region Get all AD users
-            $M = "OU '$O' - Get all AD users"
+            $M = "Get all users in OU '$O'"
             Write-Verbose $M
             Write-EventLog @EventVerboseParams -Message $M
 
@@ -292,7 +292,7 @@ Begin {
         }
 
         #region Get group members for excluded groups and listing groups, these can be outside the OU
-        $M = "OU '$O' - Get group members for excluded groups and listing groups"
+        $M = "Get group members for excluded groups and listing groups in OU '$O'"
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
             
