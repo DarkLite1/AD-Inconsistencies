@@ -67,6 +67,7 @@ Param (
     [String]$ScriptName,
     [Parameter(Mandatory)]
     [String]$ImportFile,
+    [Switch]$NoEmail,
     [String]$ScriptCreateTicketsFile = 'Create tickets.ps1',
     [String]$LogFolder = $env:POWERSHELL_LOG_FOLDER,
     [String]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
@@ -1075,42 +1076,44 @@ Process {
 
 End {
     Try {
-        #region Export source data to Excel
-        $MailParams = @{
-            Attachments = @()
-        }
+        if (-not $NoEmail) {
+            #region Export source data to Excel
+            $MailParams = @{
+                Attachments = @()
+            }
 
-        $ExcelParams = @{
-            Path         = "$LogFile - Source data.xlsx"
-            AutoSize     = $true
-            FreezeTopRow = $true
-        }
+            $ExcelParams = @{
+                Path         = "$LogFile - Source data.xlsx"
+                AutoSize     = $true
+                FreezeTopRow = $true
+            }
 
-        Write-Verbose "Export source data to Excel file '$($ExcelParams.Path)'"
+            Write-Verbose "Export source data to Excel file '$($ExcelParams.Path)'"
 
-        $MailParams.Attachments += $ExcelParams.Path
+            $MailParams.Attachments += $ExcelParams.Path
 
-        if ($Computers) {
-            Write-Verbose "Export $(@($Computers).Count) computers"
-            $Computers | Export-Excel @ExcelParams -TableName Computers -WorksheetName Computers
+            if ($Computers) {
+                Write-Verbose "Export $(@($Computers).Count) computers"
+                $Computers | Export-Excel @ExcelParams -TableName Computers -WorksheetName Computers
+            }
+            if ($Groups) {
+                Write-Verbose "Export $(@($Groups).Count) groups"
+                $Groups | Export-Excel @ExcelParams -TableName Groups -WorksheetName Groups
+            }
+            if ($RolGroups) {
+                Write-Verbose "Export $(@($RolGroups).Count) ROL groups"
+                $RolGroups | Export-Excel @ExcelParams -TableName RolGroups -WorksheetName GroupsROL
+            }
+            if ($Users) {
+                Write-Verbose "Export $(@($Users).Count) users"
+                $Users | Export-Excel @ExcelParams -TableName Users -WorksheetName Users
+            }
+            if ($GitUsers) {
+                Write-Verbose "Export $(@($GitUsers).Count) GIT users"
+                $GitUsers | Export-Excel @ExcelParams -TableName GitUsers -WorksheetName UsersGIT
+            }
+            #endregion
         }
-        if ($Groups) {
-            Write-Verbose "Export $(@($Groups).Count) groups"
-            $Groups | Export-Excel @ExcelParams -TableName Groups -WorksheetName Groups
-        }
-        if ($RolGroups) {
-            Write-Verbose "Export $(@($RolGroups).Count) ROL groups"
-            $RolGroups | Export-Excel @ExcelParams -TableName RolGroups -WorksheetName GroupsROL
-        }
-        if ($Users) {
-            Write-Verbose "Export $(@($Users).Count) users"
-            $Users | Export-Excel @ExcelParams -TableName Users -WorksheetName Users
-        }
-        if ($GitUsers) {
-            Write-Verbose "Export $(@($GitUsers).Count) GIT users"
-            $GitUsers | Export-Excel @ExcelParams -TableName GitUsers -WorksheetName UsersGIT
-        }
-        #endregion
 
         #region Export to Excel and email table rows
         Write-Verbose 'Export incorrect data to Excel'
@@ -1210,15 +1213,17 @@ End {
                 }
                 #endregion
 
-                #region Export to Excel file
-                Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
-                $ExcelParams.TableName = $A.Value.WorksheetName
-                $ExcelParams.WorkSheetName = $A.Value.WorksheetName
-                $A.Value.Data | Select-Object $A.Value.PropertyToExport |
-                Export-Excel @ExcelParams
-                #endregion
+                if (-not $NoEmail) {
+                    #region Export to Excel file
+                    Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
+                    $ExcelParams.TableName = $A.Value.WorksheetName
+                    $ExcelParams.WorkSheetName = $A.Value.WorksheetName
+                    $A.Value.Data | Select-Object $A.Value.PropertyToExport |
+                    Export-Excel @ExcelParams
+                    #endregion
                 
-                $MailParams.Attachments += $ExcelParams.Path
+                    $MailParams.Attachments += $ExcelParams.Path
+                }
             }
         }
         #endregion
@@ -1328,7 +1333,9 @@ $(if($ExcludedGroups) {
 
         Remove-EmptyParamsHC -Name $MailParams
         Get-ScriptRuntimeHC -Stop
-        Send-MailHC @MailParams
+        if (-not $NoEmail) {
+            Send-MailHC @MailParams
+        }
         #endregion
     }
     Catch {

@@ -1744,7 +1744,6 @@ Describe "When the input file contains the parameter 'Tickets'" {
         $AllObjects['Computer - EnabledInDisabledOU'].Data.Name | 
         Should -Be @('PC2')
     }
-
     It "the text 'AUTO TICKET' is added to the description in the e-mail" {
         Should -Invoke Send-MailHC -Times 1 -Exactly -Scope Describe -ParameterFilter {
             $Message -like "*<td>'LastLogonDate' over $InactiveDays days<br>(Excluding OU 'Disabled') //AUTO TICKET</td>*"
