@@ -6,6 +6,50 @@
 
     .DESCRIPTION
         Script to check the active directory for inconsistencies and violations against the BNL Naming convention.
+
+    .PARAMETER ImportFile
+        A .json file containing the script arguments
+
+        When the key 'Tickets' is used, a ticket will be created for that 
+        specific topic. 
+
+        Ex.
+        {
+            "MailTo": ["notification@contoso.net"],
+            "InactiveDays": 40,
+            "Prefix": {
+                "QuotaGroup": "Quota limit"
+            },
+            "RolGroup": {
+                "Prefix": "ROL-",
+                "PlaceHolderAccount": "placeholder"
+            },
+            "AllowedEmployeeType": [ "Vendor", "Employee" ],
+            "Group": [
+                {
+                    "Name": "Leavers",
+                    "Type": "Exclude",
+                    "ListMembers": true
+                },
+                {
+                    "Name": "Deprovisioned users",
+                    "Type": null,
+                    "ListMembers": true
+                }
+            ],
+            "OU": ["OU=BEL,OU=EU,DC=contoso,DC=net"],
+            "Git": {
+                "OU": "OU=GIT,DC=contoso,DC=net",
+                "CountryCode": ["BE", "LU", "NL"]
+            },
+            "Tickets": {
+                "User - VendorsNotExpiring": {
+                    "ShortDescription": "Vendor account not expiring",
+                    "Description": "Please set the expiration date"
+                }
+            }
+        }
+
 #>
 
 Param (
