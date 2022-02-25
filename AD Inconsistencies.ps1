@@ -162,7 +162,7 @@ Begin {
         }
         #endregion
 
-        #region Create tickets file
+        #region Get tickets file
         Try {
             $scriptCreateTicketsItem = Get-PathItemHC -Leaf $ScriptCreateTicketsFile
         }
@@ -179,8 +179,6 @@ Begin {
         $i = 0
 
         Foreach ($O in $OU) {
-            Write-Verbose "OU '$O'"
-
             #region Match OU with country name
             Try {
                 Write-Verbose 'Match OU with country name'
@@ -204,7 +202,10 @@ Begin {
             #endregion
 
             #region Get all AD computers
-            Write-Verbose 'Get all AD computers'
+            $M = "OU '$O' - Get all AD computers "
+            Write-Verbose $M
+            Write-EventLog @EventVerboseParams -Message $M
+
             $Computers += Get-ADComputer -Filter * -SearchBase $O -Properties CanonicalName,
             Created, LastLogonDate, Location, ManagedBy, OperatingSystem,
             mS-DS-CreatorSID | Select-Object *,
@@ -214,7 +215,10 @@ Begin {
             #endregion
 
             #region Get all AD groups
-            Write-Verbose 'Get all AD groups'
+            $M = "OU '$O' - Get all AD groups"
+            Write-Verbose $M
+            Write-EventLog @EventVerboseParams -Message $M
+
             $groupsWithOrphans = @()
             $groupNonTraversable = @()
 
@@ -260,7 +264,10 @@ Begin {
             #endregion
 
             #region Get all AD users
-            Write-Verbose 'Get all AD users'
+            $M = "OU '$O' - Get all AD users"
+            Write-Verbose $M
+            Write-EventLog @EventVerboseParams -Message $M
+
             $allAdUsers += @(
                 Get-ADUser -Filter * -SearchBase $O -Properties whenCreated, displayName, 
                 sn, Title, Department, Company, manager, EmployeeID, extensionAttribute8,
@@ -285,7 +292,10 @@ Begin {
         }
 
         #region Get group members for excluded groups and listing groups, these can be outside the OU
-        Write-Verbose 'Get group members for excluded groups and listing groups'
+        $M = "OU '$O' - Get group members for excluded groups and listing groups"
+        Write-Verbose $M
+        Write-EventLog @EventVerboseParams -Message $M
+            
         [Array]$tmpGroups = foreach ($E in @($File.Group).where( {
                     ($_.Type -eq 'Exclude') -or ($_.ListMembers) })) {
             [PSCustomObject]@{
@@ -336,6 +346,10 @@ Process {
         $AllObjects = @{ }
 
         #region Computers
+        $M = "Get all computers with issues"
+        Write-Verbose $M
+        Write-EventLog @EventVerboseParams -Message $M
+
         $ComputerProperties = @(
             'Name', 'Description', 'Enabled', 'OperatingSystem',
             'LastLogonDate', 'Created', 'Creator', 'Location', 'ManagedByDisplayName', 'OU'
@@ -364,6 +378,10 @@ Process {
         #endregion
 
         #region Groups
+        $M = "Get all groups with issues"
+        Write-Verbose $M
+        Write-EventLog @EventVerboseParams -Message $M
+
         #region GroupsWithOrphans
         Write-Verbose 'Get group GroupsWithOrphans'
         $AllObjects['Group - GroupsWithOrphans'] = @{
@@ -608,6 +626,10 @@ Process {
         #endregion
 
         #region Users
+        $M = "Get all users with issues"
+        Write-Verbose $M
+        Write-EventLog @EventVerboseParams -Message $M
+
         Write-Verbose 'Get user CountryNotMatchingOU'
         $AllObjects['User - CountryNotMatchingOU'] = @{
             Description      = "Country name not equal to the OU country name"
@@ -1003,6 +1025,10 @@ Process {
         #endregion
 
         #region GIT users
+        $M = "Get all GIT users with issues"
+        Write-Verbose $M
+        Write-EventLog @EventVerboseParams -Message $M
+
         if ($GitOU -and $GitSearchCountries) {
             Write-Verbose "Get users from GIT OU '$GitOU'"
 
@@ -1088,28 +1114,40 @@ End {
 
         if (-not $NoEmail) {
             #region Export source data to Excel
-            Write-Verbose "Export source data to Excel file '$($ExcelParams.Path)'"
-
+            $M = "Export source data to Excel file '$($ExcelParams.Path)'"
+            Write-Verbose $M
+            Write-EventLog @EventVerboseParams -Message $M
+        
             $MailParams.Attachments += $ExcelParams.Path
 
             if ($Computers) {
-                Write-Verbose "Export $(@($Computers).Count) computers"
+                $M = "Export $(@($Computers).Count) computers to Excel file '$($ExcelParams.Path)'"
+                Write-Verbose $M
+                Write-EventLog @EventOutParams -Message $M
                 $Computers | Export-Excel @ExcelParams -TableName Computers -WorksheetName Computers
             }
             if ($Groups) {
-                Write-Verbose "Export $(@($Groups).Count) groups"
+                $M = "Export $(@($Groups).Count) groups to Excel file '$($ExcelParams.Path)'"
+                Write-Verbose $M
+                Write-EventLog @EventOutParams -Message $M
                 $Groups | Export-Excel @ExcelParams -TableName Groups -WorksheetName Groups
             }
             if ($RolGroups) {
-                Write-Verbose "Export $(@($RolGroups).Count) ROL groups"
+                $M = "Export $(@($RolGroups).Count) ROL groups to Excel file '$($ExcelParams.Path)'"
+                Write-Verbose $M
+                Write-EventLog @EventOutParams -Message $M
                 $RolGroups | Export-Excel @ExcelParams -TableName RolGroups -WorksheetName GroupsROL
             }
             if ($Users) {
-                Write-Verbose "Export $(@($Users).Count) users"
+                $M = "Export $(@($Users).Count) users to Excel file '$($ExcelParams.Path)'"
+                Write-Verbose $M
+                Write-EventLog @EventOutParams -Message $M
                 $Users | Export-Excel @ExcelParams -TableName Users -WorksheetName Users
             }
             if ($GitUsers) {
-                Write-Verbose "Export $(@($GitUsers).Count) GIT users"
+                $M = "Export $(@($GitUsers).Count) GIT users to Excel file '$($ExcelParams.Path)'"
+                Write-Verbose $M
+                Write-EventLog @EventOutParams -Message $M
                 $GitUsers | Export-Excel @ExcelParams -TableName GitUsers -WorksheetName UsersGIT
             }
             #endregion
@@ -1215,7 +1253,10 @@ End {
 
                 if (-not $NoEmail) {
                     #region Export to Excel file
-                    Write-Verbose "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects"
+                    $M = "Export '$($A.Key)' with $(@($A.Value.Data).Count) objects to worksheet '$($A.Value.WorksheetName)' in Excel file '$($ExcelParams.Path)'"
+                    Write-Verbose $M
+                    Write-EventLog @EventOutParams -Message $M
+
                     $ExcelParams.TableName = $A.Value.WorksheetName
                     $ExcelParams.WorkSheetName = $A.Value.WorksheetName
                     $A.Value.Data | Select-Object $A.Value.PropertyToExport |
