@@ -1156,6 +1156,14 @@ End {
         $UsersHtmlList = $ComputersHtmlList = $GroupsHtmlList =
         $GitUsersHtmlList = $GroupMembersHtmlList = @()
 
+        #region Test for incorrect ticket topic
+        $File.Tickets | Get-Member -MemberType NoteProperty | Where-Object {
+            $AllObjects.GetEnumerator().Name -notContains $_.Name
+        } | ForEach-Object {
+            throw "The parameter 'Tickets' in the file '$ImportFile' contains an invalid topic name '$($_.Name)', valid topic names are: '$(($AllObjects.GetEnumerator().Name | Sort-Object) -join "', '")'"
+        }
+        #endregion
+
         foreach (
             $A in 
             $AllObjects.GetEnumerator() | Sort-Object { $_.Value.WorkSheetName }

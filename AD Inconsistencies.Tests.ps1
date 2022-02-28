@@ -1790,20 +1790,35 @@ Describe "When the input file contains the parameter 'Tickets'" {
             ($Data.Name -eq 'PC1')
         }
     }
-    It 'an error is throw when an unknwon string is used' {
+}
+Describe 'a terminating error is thrown when' {
+    It 'the input file contains a Tickets parameter name that is unknwon' {
+        Mock Get-ADOrganizationalUnit {
+            [PSCustomObject]@{
+                CanonicalName = 'contoso.com/EU/BEL'
+                Description   = 'Belgium'
+            }
+        }
+
         $testInputFile.Tickets = @{
-            'Computer - NonExistingString' = @{
+            'NonExisting' = @{
+                shortDescription = 'a'
+                description      = 'b'
+            }
+            'Computer - Inactive'          = @{
                 shortDescription = 'a'
                 description      = 'b'
             }
         }
+        # Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
 
         .$testScript @testParams
 
         Should -Invoke Send-MailHC -Times 1 -Exactly -ParameterFilter {
             ($To -eq $ScriptAdmin ) -and
-            (Subject -eq 'FAILURE')
+            ($Subject -eq 'FAILURE') -and
+            ($Message -like "*he parameter 'Tickets' in the file '$ImportFile' contains an invalid topic name 'NonExisting'*")
         }
-    } -Tag test
-}
+    } 
+} -Tag test
