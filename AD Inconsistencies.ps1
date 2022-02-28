@@ -1153,9 +1153,6 @@ End {
             #endregion
         }
 
-        #region Export to Excel and email table rows
-        Write-Verbose 'Export incorrect data to Excel'
-
         $UsersHtmlList = $ComputersHtmlList = $GroupsHtmlList =
         $GitUsersHtmlList = $GroupMembersHtmlList = @()
 
@@ -1267,7 +1264,6 @@ End {
                 }
             }
         }
-        #endregion
 
         #region Create HTML tables for the email
         Write-Verbose 'Create HTML for e-mail'

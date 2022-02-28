@@ -1790,4 +1790,20 @@ Describe "When the input file contains the parameter 'Tickets'" {
             ($Data.Name -eq 'PC1')
         }
     }
+    It 'an error is throw when an unknwon string is used' {
+        $testInputFile.Tickets = @{
+            'Computer - NonExistingString' = @{
+                shortDescription = 'a'
+                description      = 'b'
+            }
+        }
+        $testInputFile | ConvertTo-Json | Out-File @testOutParams
+
+        .$testScript @testParams
+
+        Should -Invoke Send-MailHC -Times 1 -Exactly -ParameterFilter {
+            ($To -eq $ScriptAdmin ) -and
+            (Subject -eq 'FAILURE')
+        }
+    } -Tag test
 }
