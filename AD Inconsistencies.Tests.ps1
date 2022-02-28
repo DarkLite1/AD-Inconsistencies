@@ -50,12 +50,6 @@ BeforeAll {
             OU          = "OU=GIT,DC=contoso,DC=net"
             CountryCode = @( "BE", "LU", "NL")
         }
-        Tickets             = @{
-            'RolGroup - PlaceHolder' = @{
-                shortDescription = ''
-                Description      = ''
-            }
-        }
     }
 
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
