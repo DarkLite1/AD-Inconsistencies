@@ -995,6 +995,29 @@ Describe 'Users' {
             'IncorrectUser'
         )
     } 
+    It 'no manager' {
+        Mock Get-ADGroupMember
+        Mock Get-ADUser {
+            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                SamAccountName    = 'norris'
+                DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                Manager           = $null
+                CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
+                ScriptPath        = ''
+            }
+            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                SamAccountName    = 'lswagger'
+                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                Manager           = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
+                ScriptPath        = ''
+            }
+        }
+
+        .$testScript @testParams
+
+        $AllObjects['User - NoManager'].Data.SamAccountName | Should -eq 'norris'
+    }
     It 'manager of self' {
         Mock Get-ADGroupMember
         Mock Get-ADUser {
@@ -1795,11 +1818,11 @@ Describe 'a terminating error is thrown when' {
         }
 
         $testInputFile.Tickets = @{
-            'NonExisting' = @{
+            'NonExisting'         = @{
                 shortDescription = 'a'
                 description      = 'b'
             }
-            'Computer - Inactive'          = @{
+            'Computer - Inactive' = @{
                 shortDescription = 'a'
                 description      = 'b'
             }
@@ -1815,4 +1838,4 @@ Describe 'a terminating error is thrown when' {
             ($Message -like "*he parameter 'Tickets' in the file '$ImportFile' contains an invalid topic name 'NonExisting'*")
         }
     } 
-} -Tag test
+}

@@ -865,6 +865,15 @@ Process {
             Data             = $Users.Where( { $_.DistinguishedName -eq $_.Manager })
         }
 
+        Write-Verbose 'Get user NoManager'
+        $AllObjects['User - NoManager'] = @{
+            Description      = "'Manager' blank"
+            WorksheetName    = 'NoManager'
+            PropertyToExport = 'SamAccountName', 'Name', 'DisplayName', 'ManagerDisplayName', 'OU'
+            Type             = 'User'
+            Data             = $Users.Where( { -not $_.Manager })
+        }
+
         Write-Verbose 'Get user SamNameWithNr'
         $AllObjects['User - SamNameWithNr'] = @{
             Description      = "'SamAccountName' containing a number"
