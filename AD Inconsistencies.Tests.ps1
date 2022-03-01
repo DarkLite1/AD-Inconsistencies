@@ -31,17 +31,17 @@ BeforeAll {
         AllowedEmployeeType = @("Vendor", "Plant", "Kiosk")
         Group               = @(
             @{
-                Name        = "BEL ATT Leaver"
+                Name        = "Leavers"
                 Type        = "Exclude"
                 ListMembers = $true
             }
             @{
-                Name        = "BEL ATT User No OCS"
+                Name        = "No OCS"
                 Type        = "NoOCS"
                 ListMembers = $false
             }
             @{
-                Name        = "BEL ATT No Deprovision"
+                Name        = "Deprovisioned users"
                 Type        = $null
                 ListMembers = $true
             }
@@ -69,7 +69,12 @@ BeforeAll {
     Mock Get-ADDisplayNameHC
     Mock Get-ADDisplayNameFromSID
     Mock Get-ADObject { $true }
-    Mock Get-ADOrganizationalUnit
+    Mock Get-ADOrganizationalUnit {
+        [PSCustomObject]@{
+            CanonicalName = 'contoso.com/EU/BEL'
+            Description   = 'Belgium'
+        }
+    }
     Mock Get-ADUser
     Mock Get-ADTSProfileHC
     Mock Test-ADOUExistsHC { $true }
@@ -185,15 +190,6 @@ Describe 'Prerequisites' {
 }
 Describe 'Computers' {
     BeforeAll {
-        Mock Get-ADGroup
-        Mock Get-ADUser
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
-            }
-        }
-        
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
     }
     BeforeEach {
@@ -305,17 +301,6 @@ Describe 'Computers' {
 }
 Describe 'ROL Groups' {
     BeforeAll {
-        Mock Get-ADDisplayNameHC
-        Mock Get-ADComputer
-        Mock Get-ADGroupMember
-        Mock Get-ADUser
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
-            }
-        }
-
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
     }
     BeforeEach {
@@ -622,16 +607,7 @@ Describe 'Groups' {
         }
         $testNewFile | ConvertTo-Json | Out-File @testOutParams
         Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
-
-        Mock Get-ADComputer
-        Mock Get-ADGroup
-        Mock Get-ADObject { $true }
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
-            }
-        }
+    
         Mock Get-ADGroupMember {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'cnorris'
@@ -813,16 +789,6 @@ Describe 'Groups' {
 }
 Describe 'Exclude users' {
     BeforeEach {
-        Mock Get-ADComputer
-        Mock Get-ADGroup
-        Mock Get-ADObject { $true }
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
-            }
-        }
-
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
         Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
     }
@@ -938,17 +904,6 @@ Describe 'Exclude users' {
     } 
 }
 Describe 'Users' {
-    BeforeAll {
-        Mock Get-ADComputer
-        Mock Get-ADGroup
-        Mock Get-ADGroupMember
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
-            }
-        }
-    }
     BeforeEach {
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
         Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
@@ -1657,18 +1612,6 @@ Describe 'Users' {
     }
 }
 Describe 'GIT users' {
-    BeforeAll {
-        Mock Get-ADComputer
-        Mock Get-ADGroup
-        Mock Get-ADGroupMember
-        Mock Get-ADUser
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
-            }
-        }
-    }
     BeforeEach {
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
         Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
@@ -1704,15 +1647,6 @@ Describe 'GIT users' {
 }
 Describe 'an e-mail' {
     BeforeAll {
-        Mock Get-ADGroup
-        Mock Get-ADUser
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
-            }
-        }
-        
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
     }
     It 'is sent when NoMEmail is not used' {
@@ -1762,14 +1696,6 @@ Describe "When the input file contains the parameter 'Tickets'" {
                 CanonicalName     = 'contoso.com/EU/BEL/Disabled/Computers/PC'
                 Enabled           = $true
                 LastLogonDate     = ($testDate).AddMonths( -9)
-            }
-        }
-        Mock Get-ADGroup
-        Mock Get-ADUser
-        Mock Get-ADOrganizationalUnit {
-            [PSCustomObject]@{
-                CanonicalName = 'contoso.com/EU/BEL'
-                Description   = 'Belgium'
             }
         }
         
@@ -1827,7 +1753,6 @@ Describe 'a terminating error is thrown when' {
                 description      = 'b'
             }
         }
-        # Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
 
         .$testScript @testParams
