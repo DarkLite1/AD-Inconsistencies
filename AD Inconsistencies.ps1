@@ -328,7 +328,7 @@ Begin {
 
         $Users = $allAdUsers.Where( {
                 ($_.CanonicalName -NotMatch '/Terminated users/|/Disabled/') -and
-                ($ExcludedGroups.Members.SamAccountName -notcontains $_.SamAccountName)
+                ($ExcludedGroups.Members.SamAccountName -notContains $_.SamAccountName)
             })
 
         $Groups = $allAdGroups.Keys
