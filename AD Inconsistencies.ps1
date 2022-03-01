@@ -1228,26 +1228,32 @@ End {
                 'User' {
                     $ExcelParams.Path = "$LogFile - Users.xlsx"
                     $UsersHtmlList += $HtmlListItem
+                    break
                 }
                 'GitUser' {
                     $ExcelParams.Path = "$LogFile - GIT Users.xlsx"
                     $GitUsersHtmlList += $HtmlListItem
+                    break
                 }
                 'Computer' {
                     $ExcelParams.Path = "$LogFile - Computers.xlsx"
                     $ComputersHtmlList += $HtmlListItem
+                    break
                 }
                 'Group' {
                     $ExcelParams.Path = "$LogFile - Groups.xlsx"
                     $GroupsHtmlList += $HtmlListItem
+                    break
                 }
                 'RolGroup' {
                     $ExcelParams.Path = "$LogFile - ROL Groups.xlsx"
                     $RolGroupsHtmlList += $HtmlListItem
+                    break
                 }
                 'ListGroupMembers' {
                     $ExcelParams.Path = "$LogFile - Group members.xlsx"
                     $GroupMembersHtmlList += $HtmlListItem
+                    break
                 }
                 Default {
                     throw "The custom object type '$_' is not supported. Please implement this feature."
