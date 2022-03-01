@@ -909,7 +909,6 @@ Describe 'Users' {
         Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
     }
     It 'country code is not matching the OU country code' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             'France', 'Germany', 'Luxembourg' | ForEach-Object {
                 New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
@@ -951,7 +950,6 @@ Describe 'Users' {
         )
     } 
     It 'no manager' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norris'
@@ -974,7 +972,6 @@ Describe 'Users' {
         $AllObjects['User - NoManager'].Data.SamAccountName | Should -eq 'norris'
     }
     It 'manager of self' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norrisc'
@@ -997,7 +994,6 @@ Describe 'Users' {
         $AllObjects['User - ManagerOfSelf'].Data.SamAccountName | Should -eq 'norrisc'
     } 
     It 'display name wrong' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
@@ -1049,7 +1045,6 @@ Describe 'Users' {
         )
     } 
     It 'duplicate display name' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
@@ -1095,7 +1090,6 @@ Describe 'Users' {
         )
     } 
     It 'TS Home directory does not exist' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
@@ -1121,7 +1115,6 @@ Describe 'Users' {
         $AllObjects['User - TSHomeDirNotExist'].Data.SamAccountName | Should -Be 'Incorrect'
     } 
     It 'TS profile does not exist' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
@@ -1147,7 +1140,6 @@ Describe 'Users' {
         $AllObjects['User - TSProfileNotExisting'].Data.SamAccountName | Should -Be 'Incorrect'
     } 
     It 'employeeType not allowed' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norrisc'
@@ -1178,7 +1170,6 @@ Describe 'Users' {
         $AllObjects['User - EmployeeTypeNotAllowed'].Data.SamAccountName | Should -Be @('lswagger', 'cdaniel')
     } 
     It 'employeeType Vendor' {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'cnorris'
@@ -1200,7 +1191,6 @@ Describe 'Users' {
     } 
     It "HomeDirectory not starting with '\\GROUPHC.NET\BNL\HOME\'
             and excluding EmployeeType 'Service accounts' and 'Resource accounts'" {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'InCorrect'
@@ -1263,7 +1253,6 @@ Describe 'Users' {
         $AllObjects['User - HomeDirWrong'].Data.SamAccountName | Should -Be @('InCorrect', 'InCorrect')
     } 
     It "HomeDirectory set for EmployeeType 'Service' and 'Resource' when it's not needed" {
-        Mock Get-ADGroupMember
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'InCorrect'
