@@ -802,7 +802,7 @@ Process {
 
         Write-Verbose 'Get user Inactive'
         $AllObjects['User - Inactive'] = @{
-            Description      = "'LastLogonDate' over $InactiveDays days //AUTO TICKET<br>(Excluding 'EmployeeType' Resource and the OU's 'Terminated users' and 'Disabled\Users')"
+            Description      = "'LastLogonDate' over $InactiveDays days<br>(Excluding 'EmployeeType' Resource and the OU's 'Terminated users' and 'Disabled\Users')"
             WorksheetName    = 'Inactive'
             PropertyToExport = 'SamAccountName', 'DisplayName', 'LastLogonDate',
             'EmployeeType', 'ManagerDisplayName', 'whenCreated', 'OU'
