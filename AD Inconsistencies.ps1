@@ -1220,7 +1220,7 @@ End {
             ), 
             $A.Value.WorksheetName, 
             $(
-                if ($createTicket) { $A.Value.Description + ' //AUTO TICKET' }
+                if ($createTicket) { $A.Value.Description + '<br><b>(AUTO TICKET)</b>' }
                 else { $A.Value.Description }
             )
 
