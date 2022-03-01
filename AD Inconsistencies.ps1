@@ -1033,9 +1033,14 @@ Process {
             Write-Verbose "Get users from GIT OU '$GitOU'"
 
             $GitUsers = @(Get-ADUser -SearchBase $GitOU -Filter $GitSearchCountries -Properties LastLogonDate,
-                WhenCreated, Country, CanonicalName, manager | Select-Object *,
+                WhenCreated, Country, CanonicalName, manager | 
+                Select-Object *,
                 @{N = 'OU'; E = { ConvertTo-OuNameHC $_.CanonicalName } },
-                @{N = 'ManagerDisplayName'; E = { if ($_.manager) { Get-ADDisplayNameHC $_.manager } } })
+                @{
+                    N = 'ManagerDisplayName'; 
+                    E = { if ($_.manager) { Get-ADDisplayNameHC $_.manager } } 
+                }
+            )
 
             Write-Verbose 'Get GIT user Inactive'
             $AllObjects['GitUser - Inactive'] = @{
@@ -1057,7 +1062,11 @@ Process {
                 PropertyToExport = 'Name', 'SamAccountName', 'ManagerDisplayName', 'LastLogonDate',
                 'WhenCreated', 'Country', 'Enabled', 'OU'
                 Type             = 'GitUser'
-                Data             = $GitUsers.where( { ($_.Enabled) -and (-not $_.manager) })
+                Data             = $GitUsers.where( 
+                    { 
+                    ($_.Enabled) -and (-not $_.manager) 
+                    }
+                )
             }
 
             Write-Verbose 'Get GIT user NotOwnManager'
