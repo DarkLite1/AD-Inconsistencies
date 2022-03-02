@@ -867,11 +867,16 @@ Process {
 
         Write-Verbose 'Get user NoManager'
         $AllObjects['User - NoManager'] = @{
-            Description      = "'Manager' blank"
+            Description      = "'Manager' blank<br>excluding EmployeeType 'Resource' and 'Service'."
             WorksheetName    = 'NoManager'
             PropertyToExport = 'SamAccountName', 'Name', 'DisplayName', 'ManagerDisplayName', 'OU'
             Type             = 'User'
-            Data             = $Users.Where( { -not $_.Manager })
+            Data             = $Users.Where( { 
+                    (-not $_.Manager) -and
+                    ($_.EmployeeType -ne 'Resource') -and
+                    ($_.EmployeeType -ne 'Service')
+                }
+            )
         }
 
         Write-Verbose 'Get user SamNameWithNr'

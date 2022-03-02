@@ -952,16 +952,34 @@ Describe 'Users' {
     It 'no manager' {
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                SamAccountName    = 'picard'
+                DistinguishedName = "CN=picard,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                EmployeeType      = 'Service'
+                Manager           = $null
+                CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
+                ScriptPath        = ''
+            }
+            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                SamAccountName    = 'kirk'
+                DistinguishedName = "CN=kirk,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                EmployeeType      = 'Resource'
+                Manager           = $null
+                CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
+                ScriptPath        = ''
+            }
+            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norris'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                EmployeeType      = 'Employee'
                 Manager           = $null
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'lswagger'
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
-                Manager           = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Lee Swagger\, Bob,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                EmployeeType      = 'Employee'
+                Manager           = "CN=Norris,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
