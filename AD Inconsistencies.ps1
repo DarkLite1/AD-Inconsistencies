@@ -541,13 +541,12 @@ Process {
                 }
             }
 
-            $RolGroupWorksheetName = 'ROL_Groups_incorrect'
             $RolGroupType = 'RolGroup'
             
             Write-Verbose 'Get ROL group incorrect'
             $AllObjects['RolGroup - Incorrect'] = @{
                 Description      = "Incorrect ROL groups"
-                WorksheetName    = $RolGroupWorksheetName
+                WorksheetName    = 'ROL_Groups_incorrect'
                 PropertyToExport = 'Name', 'CN', 'DisplayName', 'Description',
                 'GroupCategory', 'GroupScope',
                 'PlaceHolder', 'Mail', 'ManagedByDisplayName', 'OU',
@@ -560,8 +559,8 @@ Process {
                 Write-Verbose 'Get ROL group PlaceHolder'
                 $AllObjects['RolGroup - PlaceHolder'] = @{
                     Description      = "Missing place holder account '$RolPlaceholderAccount' as member"
-                    WorksheetName    = $RolGroupWorksheetName
-                    PropertyToExport = $null
+                    WorksheetName    = 'MissingPlaceHolder'
+                    PropertyToExport = 'Name', 'Description', 'OU'
                     Type             = $RolGroupType
                     Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'PlaceHolder' })
                 }
@@ -570,8 +569,8 @@ Process {
             Write-Verbose 'Get ROL group Mail'
             $AllObjects['RolGroup - Mail'] = @{
                 Description      = "'Mail' blank"
-                WorksheetName    = $RolGroupWorksheetName
-                PropertyToExport = $null
+                WorksheetName    = 'MailBlank'
+                PropertyToExport = 'Name', 'Description', 'OU', 'Mail'
                 Type             = $RolGroupType
                 Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'Mail' })
             }
@@ -579,8 +578,8 @@ Process {
             Write-Verbose 'Get ROL group GroupScope'
             $AllObjects['RolGroup - GroupScope'] = @{
                 Description      = "'GroupScope' not 'Universal'"
-                WorksheetName    = $RolGroupWorksheetName
-                PropertyToExport = $null
+                WorksheetName    = 'GroupScopeNotUniversal'
+                PropertyToExport = 'Name', 'Description', 'OU', 'GroupScope'
                 Type             = $RolGroupType
                 Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'GroupScope' })
             }
@@ -588,8 +587,8 @@ Process {
             Write-Verbose 'Get ROL group GroupCategory'
             $AllObjects['RolGroup - GroupCategory'] = @{
                 Description      = "'GroupCategory' not 'Security'"
-                WorksheetName    = $RolGroupWorksheetName
-                PropertyToExport = $null
+                WorksheetName    = 'GroupCategoryNotSecurity'
+                PropertyToExport = 'Name', 'Description', 'OU', 'GroupCategory'
                 Type             = $RolGroupType
                 Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'GroupCategory' })
             }
@@ -597,8 +596,8 @@ Process {
             Write-Verbose 'Get ROL group CN'
             $AllObjects['RolGroup - CN'] = @{
                 Description      = "'CN' not equal to 'Name'"
-                WorksheetName    = $RolGroupWorksheetName
-                PropertyToExport = $null
+                WorksheetName    = 'NameToSameAsCN'
+                PropertyToExport = 'Name', 'CN', 'Description', 'OU'
                 Type             = $RolGroupType
                 Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'CN' })
             }
@@ -607,8 +606,8 @@ Process {
             $AllObjects['RolGroup - DisplayName'] = @{
                 Description      = "'DisplayName' not equal to 'Name'<br>
         (Where the word 'ROL' is not replaced with the word 'DIS')"
-                WorksheetName    = $RolGroupWorksheetName
-                PropertyToExport = $null
+                WorksheetName    = 'DisplayNameNotSameAsName'
+                PropertyToExport = 'Name', 'DisplayName', 'CN', 'Description', 'OU'
                 Type             = $RolGroupType
                 Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'DisplayName' })
             }
@@ -616,8 +615,8 @@ Process {
             Write-Verbose 'Get ROL group ManagedBy'
             $AllObjects['RolGroup - ManagedBy'] = @{
                 Description      = "'ManagedBy' blank"
-                WorksheetName    = $RolGroupWorksheetName
-                PropertyToExport = $null
+                WorksheetName    = 'ManagedByBlank'
+                PropertyToExport = 'Name', 'OU', 'ManagedBy'
                 Type             = $RolGroupType
                 Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'ManagedBy' })
             }
