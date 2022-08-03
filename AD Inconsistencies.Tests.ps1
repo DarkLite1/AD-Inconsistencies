@@ -968,9 +968,17 @@ Describe 'Users' {
                 ScriptPath        = ''
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                SamAccountName    = 'spock'
+                DistinguishedName = "CN=spock,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                EmployeeType      = 'Employee'
+                Manager           = $null
+                CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
+                ScriptPath        = ''
+            }
+            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norris'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
-                EmployeeType      = 'Employee'
+                EmployeeType      = 'Vendor'
                 Manager           = $null
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
@@ -978,7 +986,7 @@ Describe 'Users' {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'lswagger'
                 DistinguishedName = "CN=Lee Swagger\, Bob,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
-                EmployeeType      = 'Employee'
+                EmployeeType      = 'Vendor'
                 Manager           = "CN=Norris,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
