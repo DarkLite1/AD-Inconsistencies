@@ -872,9 +872,22 @@ Process {
             Type             = 'User'
             Data             = $Users.Where( { 
                     (-not $_.Manager) -and
-                    ($_.EmployeeType -ne 'Resource') -and
                     ($_.EmployeeType -ne 'Employee') -and
+                    ($_.EmployeeType -ne 'Resource') -and
                     ($_.EmployeeType -ne 'Service')
+                }
+            )
+        }
+
+        Write-Verbose 'Get user NoManager type Employee'
+        $AllObjects['User - NoManagerEmployee'] = @{
+            Description      = "'Manager' blank<br>Only EmployeeType 'Employee'."
+            WorksheetName    = 'NoManagerEmployee'
+            PropertyToExport = 'SamAccountName', 'Name', 'DisplayName', 'ManagerDisplayName', 'OU'
+            Type             = 'User'
+            Data             = $Users.Where( { 
+                    (-not $_.Manager) -and
+                    ($_.EmployeeType -eq 'Employee')
                 }
             )
         }
