@@ -177,10 +177,11 @@ Describe 'Prerequisites' {
         It 'send error mail when folder is not found' {
             $testInputFile | ConvertTo-Json | Out-File @testOutParams
 
-            .$testScript -ScriptName $testParams.ScriptName -LogFolder 'NonExisting' -ImportFile $testParams.ImportFile
+            .$testScript -ScriptName $testParams.ScriptName -LogFolder 'xx:\NonExisting' -ImportFile $testParams.ImportFile
 
             Should -Invoke Send-MailHC -Exactly 1 -ParameterFilter {
-                (&$MailAdminParams) -and ($Message -like "*Path*not found")
+                (&$MailAdminParams) -and 
+                ($Message -like "*Failed creating the log folder 'xx:\NonExisting'*")
             }
             Should -Invoke Write-EventLog -Exactly 1 -ParameterFilter {
                 $EntryType -eq 'Error'
