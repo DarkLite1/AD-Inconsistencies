@@ -67,7 +67,7 @@ Param (
     [String]$SQLTableTicketsDefaults = 'TicketsDefaults',
     [String]$SQLTableAdInconsistencies = 'AdInconsistencies',
 
-    [String]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
+    [String[]]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
 
 Begin {
