@@ -508,7 +508,10 @@ Process {
                 #endregion
 
                 #region GroupScope
-                if ($G.GroupScope -ne 'Universal') {
+                if (
+                    ($G.GroupScope -ne 'Universal') -and
+                    ($file.Tickets.'RolGroup - GroupScope'.Exclude -notContains $G.SamAccountName)
+                ) {
                     $Problem += 'GroupScope'
                 }
                 #endregion
@@ -586,7 +589,11 @@ Process {
                 WorksheetName    = 'GroupScopeNotUniversal'
                 PropertyToExport = 'Name', 'Description', 'OU', 'GroupScope'
                 Type             = $RolGroupType
-                Data             = $RolGroupsIncorrect.where( { $_.Problem -contains 'GroupScope' })
+                Data             = $RolGroupsIncorrect.where( 
+                    { 
+                        $_.Problem -contains 'GroupScope'
+                    }
+                )
             }
 
             Write-Verbose 'Get ROL group GroupCategory'

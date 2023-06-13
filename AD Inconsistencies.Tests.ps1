@@ -1,4 +1,4 @@
-﻿#Requires -Modules Pester
+﻿#Requires -Modules Pester, Toolbox.General
 #Requires -Version 5.1
 
 BeforeAll {
@@ -428,14 +428,87 @@ Describe 'ROL Groups' {
 
         .$testScript @testParams
 
-        $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | Should -HaveCount 2
+        $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | 
+        Should -HaveCount 2
+
         @(
             'BEL ROL-STAFF-IT IncorrectGroup 1',
             'BEL ROL-STAFF-IT IncorrectGroup 2'
         ) | ForEach-Object {
-            $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | Should -Contain $_
+            $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | 
+            Should -Contain $_
         }
-    } 
+    }
+    It "GroupScope needs to be 'Universal' and exclude exceptions" {
+        $testNewInputFile = Copy-ObjectHC $testInputFile
+
+        $testNewInputFile['Tickets'] = @{
+            'RolGroup - GroupScope' = @{
+                Exclude = @(
+                    'BEL ROL-STAFF-IT IncorrectGroup 3'
+                )
+            }
+        }
+
+        $testNewInputFile | ConvertTo-Json | Out-File @testOutParams
+
+        Mock Get-ADGroup {
+            $GroupName = 'BEL ROL-STAFF-IT CorrectGroup'
+            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+                SamAccountName = $GroupName
+                Description    = 'GroupScope ok'
+                CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
+                GroupScope     = 'Universal'
+                GroupCategory  = 'Security'
+            }
+
+            $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 1'
+            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+                SamAccountName = $GroupName
+                Description    = 'GroupScope not ok'
+                CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
+                GroupScope     = 'Global'
+                GroupCategory  = 'Security'
+            }
+
+            $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 2'
+            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+                SamAccountName = $GroupName
+                Description    = 'GroupScope not ok'
+                CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
+                GroupScope     = 'DomainLocal'
+                GroupCategory  = 'Security'
+            }
+
+            $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 3'
+            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+                SamAccountName = $GroupName
+                Description    = 'GroupScope not ok'
+                CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
+                GroupScope     = 'DomainLocal'
+                GroupCategory  = 'Security'
+            }
+        }
+
+        .$testScript @testParams
+
+        @(
+            'BEL ROL-STAFF-IT IncorrectGroup 1',
+            'BEL ROL-STAFF-IT IncorrectGroup 2'
+        ) | ForEach-Object {
+            $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | 
+            Should -Contain $_
+        }
+        @(
+            'BEL ROL-STAFF-IT IncorrectGroup 3'
+        ) | ForEach-Object {
+            $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | 
+            Should -Not -Contain $_
+        }
+
+        $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | 
+        Should -HaveCount 2
+    } -Tag test
     It "GroupCategory needs to be 'Security'" {
         Mock Get-ADGroup {
             $GroupName = 'BEL ROL-STAFF-IT CorrectGroup'
