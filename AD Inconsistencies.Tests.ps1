@@ -6,10 +6,6 @@ BeforeAll {
 
     $testDate = Get-Date
 
-    $MailAdminParams = {
-        ($To -eq $ScriptAdmin) -and ($Priority -eq 'High') -and ($Subject -eq 'FAILURE')
-    }
-
     $testOutParams = @{
         FilePath = (New-Item "TestDrive:/Test.json" -ItemType File).FullName
         Encoding = 'utf8'
@@ -58,6 +54,11 @@ BeforeAll {
         ImportFile          = $testOutParams.FilePath
         LogFolder           = (New-Item "TestDrive:/log" -ItemType Directory).FullName
         ScriptCreateTickets = (New-Item 'TestDrive:/tickets.ps1' -ItemType File).FullName
+        ScriptAdmin         = 'admin@contoso.com'
+    }
+
+    $MailAdminParams = {
+        ($To -eq $testParams.ScriptAdmin) -and ($Priority -eq 'High') -and ($Subject -eq 'FAILURE')
     }
 
     Mock Send-MailHC
@@ -86,14 +87,18 @@ Describe 'Prerequisites' {
             Should -BeTrue
         } 
         It 'file not existing' {
-            .$testScript -ScriptName $testParams.ScriptName -LogFolder $testParams.LogFolder -ImportFile 'NotExisting.txt'
+            $testNewParams = $testParams.Clone()
+            $testNewParams.ImportFile = 'NotExisting.txt'
+
+            .$testScript @testNewParams
+
             Should -Invoke Send-MailHC -Exactly 1 -ParameterFilter {
                 (&$MailAdminParams) -and ($Message -like "Cannot find path*")
             }
             Should -Invoke Write-EventLog -Exactly 1 -ParameterFilter {
                 $EntryType -eq 'Error'
             }
-        } 
+        }
         It 'OU missing' {
             $testNewFile = Copy-ObjectHC $testInputFile
             $testNewFile.OU = $null
@@ -177,7 +182,10 @@ Describe 'Prerequisites' {
         It 'send error mail when folder is not found' {
             $testInputFile | ConvertTo-Json | Out-File @testOutParams
 
-            .$testScript -ScriptName $testParams.ScriptName -LogFolder 'xx:\NonExisting' -ImportFile $testParams.ImportFile
+            $testNewParams = $testParams.Clone()
+            $testNewParams.LogFolder = 'xx:\NonExisting' 
+
+            .$testScript @testNewParams
 
             Should -Invoke Send-MailHC -Exactly 1 -ParameterFilter {
                 (&$MailAdminParams) -and 
@@ -186,7 +194,7 @@ Describe 'Prerequisites' {
             Should -Invoke Write-EventLog -Exactly 1 -ParameterFilter {
                 $EntryType -eq 'Error'
             }
-        } 
+        }
     }
 }
 Describe 'Computers' {
@@ -1786,7 +1794,7 @@ Describe 'an e-mail' {
     BeforeAll {
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
     }
-    It 'is sent when NoMEmail is not used' {
+    It 'is sent when NoEmail is not used' {
         .$testScript @testParams
 
         Should -Invoke Send-MailHC -Times 1 -Exactly -ParameterFilter {
@@ -1794,7 +1802,7 @@ Describe 'an e-mail' {
             ($To -eq $MailTo)
         }
     }
-    It 'is not sent when NoMEmail is used' {
+    It 'is not sent when NoEmail is used' {
         .$testScript @testParams -NoEmail
 
         Should -Not -Invoke Send-MailHC
