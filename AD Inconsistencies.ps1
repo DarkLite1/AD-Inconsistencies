@@ -495,7 +495,7 @@ Process {
 
                 #region Place holder account
                 if ($RolPlaceholderAccount = $File.RolGroup.PlaceHolderAccount) {
-                    $PlaceHolder = Get-ADGroupMember -Identity $G.SamAccountName |
+                    $PlaceHolder = Get-ADGroupMember -Identity $G.SamAccountName -Recursive |
                     Where-Object SamAccountName -EQ $RolPlaceholderAccount
 
                     if (-not $PlaceHolder) {
