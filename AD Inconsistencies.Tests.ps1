@@ -1,5 +1,5 @@
 ﻿#Requires -Modules Pester, Toolbox.General
-#Requires -Version 5.1
+#Requires -Version 7
 
 BeforeAll {
     $testUser = Get-ADUser $env:USERNAME
@@ -318,7 +318,7 @@ Describe 'ROL Groups' {
     It 'filter out non ROL groups' {
         Mock Get-ADGroup {
             $GroupName = 'BEL ROL-AGG-SAGREX Plant Manager'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'ROL group'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -327,7 +327,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL No rol group'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'No ROL group'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -336,7 +336,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL Rolos lovers'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'No ROL group'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -349,13 +349,13 @@ Describe 'ROL Groups' {
 
         $Groups | Should -HaveCount 3
         $RolGroups.SamAccountName | Should -Be 'BEL ROL-AGG-SAGREX Plant Manager'
-    } 
+    }
     It 'Mail address cannot be blank' {
         Mock Get-ADGroup {
             'Alain@gmail.com', 'Chuck.Norris@hc.com', '165465@something.com',
             'bob.dylan@heidelbergcement.com' | ForEach-Object {
                 $GroupName = 'BEL ROL-STAFF-IT CorrectGroup{0}'
-                New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+                @{
                     SamAccountName = $GroupName
                     Mail           = $_
                     Description    = 'With mail address'
@@ -363,7 +363,7 @@ Describe 'ROL Groups' {
                 }
             }
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Mail           = ''
                 Description    = 'Blank mail address'
@@ -373,7 +373,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 2'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Mail           = $null
                 Description    = 'Blank mail address'
@@ -383,7 +383,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 3'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Mail           = ' '
                 Description    = 'Blank mail address'
@@ -403,11 +403,11 @@ Describe 'ROL Groups' {
         ) | ForEach-Object {
             $AllObjects['RolGroup - Mail'].Data.SamAccountName | Should -Contain $_
         }
-    } 
+    }
     It "GroupScope needs to be 'Universal'" {
         Mock Get-ADGroup {
             $GroupName = 'BEL ROL-STAFF-IT CorrectGroup'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'GroupScope ok'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -416,7 +416,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'GroupScope not ok'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -425,7 +425,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 2'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'GroupScope not ok'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -458,11 +458,11 @@ Describe 'ROL Groups' {
             }
         }
 
-        $testNewInputFile | ConvertTo-Json | Out-File @testOutParams
+        $testNewInputFile | ConvertTo-Json -Depth 3 | Out-File @testOutParams
 
         Mock Get-ADGroup {
             $GroupName = 'BEL ROL-STAFF-IT CorrectGroup'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'GroupScope ok'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -471,7 +471,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'GroupScope not ok'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -480,7 +480,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 2'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'GroupScope not ok'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -489,7 +489,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 3'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'GroupScope not ok'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -516,11 +516,11 @@ Describe 'ROL Groups' {
 
         $AllObjects['RolGroup - GroupScope'].Data.SamAccountName | 
         Should -HaveCount 2
-    } -Tag test
+    }
     It "GroupCategory needs to be 'Security'" {
         Mock Get-ADGroup {
             $GroupName = 'BEL ROL-STAFF-IT CorrectGroup'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
                 GroupScope     = 'Universal'
@@ -528,7 +528,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
                 GroupScope     = 'Universal'
@@ -536,7 +536,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 2'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
                 GroupScope     = 'Universal'
@@ -558,7 +558,7 @@ Describe 'ROL Groups' {
         Mock Get-ADGroup {
             # Not possible to use the Name field to create a fake group
             # $GroupName = 'BEL ROL-STAFF-IT CorrectGroup'
-            # New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            # @{
             #     CN             = $GroupName
             #     SamAccountName = $GroupName
             #     Description    = 'CN ok'
@@ -566,7 +566,7 @@ Describe 'ROL Groups' {
             # }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 CN             = 'BEL DIS-STAFF-IT IncorrectGroup 1'
                 SamAccountName = $GroupName
                 Description    = 'CN not ok'
@@ -574,7 +574,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 2'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 CN             = 'BEL ROL-STAFF-IT kiwi'
                 SamAccountName = $GroupName
                 Description    = 'CN not ok'
@@ -596,7 +596,7 @@ Describe 'ROL Groups' {
         Mock Get-ADGroup {
             # Not possible to use the Name field to create a fake group
             # $GroupName = 'BEL ROL-STAFF-IT CorrectGroup'
-            # New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            # @{
             #     DisplayName    = 'BEL DIS-STAFF-IT CorrectGroup'
             #     SamAccountName = $GroupName
             #     Description    = 'DisplayName ok'
@@ -604,7 +604,7 @@ Describe 'ROL Groups' {
             # }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 DisplayName    = $GroupName
                 SamAccountName = $GroupName
                 Description    = 'DisplayName not ok'
@@ -612,7 +612,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT IncorrectGroup 2'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 DisplayName    = 'BEL ROL-STAFF-IT kiwi'
                 SamAccountName = $GroupName
                 Description    = 'DisplayName not ok'
@@ -633,7 +633,7 @@ Describe 'ROL Groups' {
     It "'ManagedBy' blank" {
         Mock Get-ADGroup {
             $GroupName = 'BEL ROL-STAFF-IT With manager'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 CN             = $GroupName
                 SamAccountName = $GroupName
                 ManagedBy      = 'Bob'
@@ -642,7 +642,7 @@ Describe 'ROL Groups' {
             }
 
             $GroupName = 'BEL ROL-STAFF-IT No manager'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 CN             = $GroupName
                 SamAccountName = $GroupName
                 ManagedBy      = $null
@@ -691,14 +691,14 @@ Describe 'Groups' {
         Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
     
         Mock Get-ADGroupMember {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'cnorris'
                 CanonicalName     = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
                 DistinguishedName = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
             }
         }
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'cnorris'
                 CanonicalName     = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
                 DistinguishedName = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
@@ -710,7 +710,7 @@ Describe 'Groups' {
     It 'excluded group members' {
         $ExcludedGroups.Members.SamAccountName | Should -Be 'cnorris'
         $ExcludedGroups.Name | Should -Be 'Group1'
-    } 
+    }
     It 'list group members' {
         $GroupMembers.Members.SamAccountName | Should -Be @('cnorris', 'cnorris')
         $GroupMembers.Name | Should -Be @('Group1', 'Group3')
@@ -718,7 +718,7 @@ Describe 'Groups' {
     It 'distribution list no manager' {
         Mock Get-ADGroup {
             $GroupName = 'BEL DIS-AGG-SAGREX Plant Manager'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'DIS group no maanager'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -728,7 +728,7 @@ Describe 'Groups' {
             }
 
             $GroupName = 'BEL DIS-AGG-SAGREX Employee'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'No DIS group no maanager'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -738,7 +738,7 @@ Describe 'Groups' {
             }
 
             $GroupName = 'BEL DIS-AGG-SAGREX District Manager'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'DIS group with maanager'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -748,7 +748,7 @@ Describe 'Groups' {
             }
 
             $GroupName = 'BEL ROL-RMC-IB Plant Managers'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'no DIS group with manager'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -766,7 +766,7 @@ Describe 'Groups' {
     It 'member not in OU' {
         Mock Get-ADGroup {
             $GroupName = 'Group1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'DIS group no maanager'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -777,19 +777,19 @@ Describe 'Groups' {
         }
 
         Mock Get-ADGroupMember {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'mike'
                 ObjectClass       = 'User'
                 CanonicalName     = 'CN=Mike,CN=Users,OU=BEL,OU=EU,DC=contoso,DC=com'
                 distinguishedName = 'CN=Mike,CN=Users,OU=BEL,OU=EU,DC=contoso,DC=com'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'bob'
                 ObjectClass       = 'User'
                 CanonicalName     = 'CN=Bob,CN=Users,OU=XXX,OU=EU,DC=contoso,DC=com'
                 distinguishedName = 'CN=Bob,CN=Users,OU=XXX,OU=EU,DC=contoso,DC=com' # incorrect OU
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'jake'
                 ObjectClass       = 'User'
                 CanonicalName     = 'CN=Jake,CN=Users,OU=BEL,OU=EU,DC=contoso,DC=com'
@@ -808,7 +808,7 @@ Describe 'Groups' {
     It 'orphaned members' {
         Mock Get-ADGroup {
             $GroupName = 'Group1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
+            @{
                 SamAccountName = $GroupName
                 Description    = 'Incorrect group'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
@@ -819,19 +819,19 @@ Describe 'Groups' {
         }
 
         Mock Get-ADGroupMember {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'mike'
                 ObjectClass       = 'User'
                 CanonicalName     = 'CN=Mike,CN=Users,OU=BEL,OU=EU,DC=contoso,DC=com'
                 distinguishedName = $null # orphaned because of no distinguishedName
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'bob'
                 ObjectClass       = 'User'
                 CanonicalName     = 'CN=Bob,CN=Users,OU=XXX,OU=EU,DC=contoso,DC=com'
                 distinguishedName = 'CN=Bob,CN=Users,OU=XXX,OU=EU,DC=contoso,DC=com'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'jake'
                 ObjectClass       = 'User'
                 CanonicalName     = 'CN=Jake,CN=Users,OU=BEL,OU=EU,DC=contoso,DC=com'
@@ -846,11 +846,10 @@ Describe 'Groups' {
     } 
     It 'non traversable groups' {
         Mock Get-ADGroup {
-            $GroupName = 'Group1'
-            New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
-                SamAccountName = $GroupName
+            @{
+                SamAccountName = 'Group1'
                 Description    = 'Incorrect group'
-                CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
+                CanonicalName  = 'contoso.com/EU/BEL/Groups/Group1'
                 GroupCategory  = 'Distribution'
                 GroupScope     = 'Universal'
                 ManagedBy      = $null
@@ -860,23 +859,23 @@ Describe 'Groups' {
         Mock Get-ADGroupMember {
             throw 'Group members cannot be retrieved'
         } -ParameterFilter {
-            'Group1' -eq $Identity.SamAccountName
+            $PipelineVariable.SamAccountName -eq 'Group1'
         }
 
         .$testScript @testParams
 
         $AllObjects['Group - NonTraversableGroups'].Data.SamAccountName |
         Should -Be 'Group1'
-    } 
+    }
 }
 Describe 'Exclude users' {
     BeforeEach {
-        $testInputFile | ConvertTo-Json | Out-File @testOutParams
+        $testInputFile | ConvertTo-Json -Depth 3 | Out-File @testOutParams
         Remove-Item -Path "$($testParams.LogFolder)\*" -Recurse
     }
     It "that are member of a group in 'ExcludedGroups'" {
         Mock Get-ADGroupMember {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'jlewis'
                 GivenName         = 'John'
                 Surname           = 'Doe'
@@ -886,7 +885,7 @@ Describe 'Exclude users' {
             }
         }
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'jlewis'
                 GivenName         = 'John'
                 Surname           = 'Doe'
@@ -894,7 +893,7 @@ Describe 'Exclude users' {
                 CanonicalName     = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
                 scriptPath        = 'logon.bat'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'mtyson'
                 GivenName         = 'John'
                 Surname           = 'Doe'
@@ -902,7 +901,7 @@ Describe 'Exclude users' {
                 CanonicalName     = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
                 scriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'norrisc'
                 GivenName         = 'John'
                 Surname           = 'Doe'
@@ -910,9 +909,11 @@ Describe 'Exclude users' {
                 CanonicalName     = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
                 scriptPath        = ''
             }
+        } -ParameterFilter {
+            $SearchBase -eq $testInputFile.OU[0]
         }
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'jlewis'
                 GivenName         = 'John'
                 Surname           = 'Doe'
@@ -920,10 +921,8 @@ Describe 'Exclude users' {
                 CanonicalName     = 'CN=Doe John,CN=Users,DC=contoso,DC=com'
                 scriptPath        = ''
             }
-        } -ParameterFilter {
-            'jlewis' -eq $Identity.SamAccountName
-        }
-
+        } 
+        
         .$testScript @testParams
 
         $Users.SamAccountName | Should -Be @(
@@ -932,12 +931,13 @@ Describe 'Exclude users' {
         )
 
         $ExcludedGroups.Members.SamAccountName | Should -Be 'jlewis'
-        $MailParams.Message | Should -Match  ($testInputFile.Group.Where( { $_.Type -eq 'Exclude' })).Name
-    } 
+        $MailParams.Message | Should -Match  ($testInputFile.Group.Where( 
+                { $_.Type -eq 'Exclude' })).Name
+    }
     It "in the OU 'Disabled'" {
         Mock Get-ADGroupMember
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'DisregardedUser'
                 EmployeeType      = 'Employee'
                 Description       = 'Disabled OU user'
@@ -946,7 +946,7 @@ Describe 'Exclude users' {
                 DistinguishedName = 'contoso.com/EU/BEL/Disabled/Users/Dummy, DisregardedUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -962,7 +962,7 @@ Describe 'Exclude users' {
     It "in the OU 'Terminated Users'" {
         Mock Get-ADGroupMember
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'DisregardedUser'
                 EmployeeType      = 'Employee'
                 Description       = 'Terminated user'
@@ -971,7 +971,7 @@ Describe 'Exclude users' {
                 DistinguishedName = 'contoso.com/EU/BEL/Terminated Users/Dummy, DisregardedUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, Correct (Somewhere) BEL'
@@ -993,7 +993,7 @@ Describe 'Users' {
     It 'country code is not matching the OU country code' {
         Mock Get-ADUser {
             'France', 'Germany', 'Luxembourg' | ForEach-Object {
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName = 'IncorrectUser'
                     co             = $_
                     Description    = 'Country incorrect'
@@ -1002,7 +1002,7 @@ Describe 'Users' {
                     ScriptPath     = ''
                 }
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'IncorrectUser'
                 co                = $null
                 Description       = 'Country incorrect'
@@ -1011,7 +1011,7 @@ Describe 'Users' {
                 DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'CorrectUser'
                 co                = 'Belgium'
                 Description       = 'Country correct'
@@ -1033,7 +1033,7 @@ Describe 'Users' {
     } 
     It 'no manager' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'picard'
                 DistinguishedName = "CN=picard,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Service'
@@ -1041,7 +1041,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'kirk'
                 DistinguishedName = "CN=kirk,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Resource'
@@ -1049,7 +1049,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'spock'
                 DistinguishedName = "CN=spock,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Employee'
@@ -1057,7 +1057,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'norris'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Vendor'
@@ -1065,7 +1065,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'lswagger'
                 DistinguishedName = "CN=Lee Swagger\, Bob,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Vendor'
@@ -1081,7 +1081,7 @@ Describe 'Users' {
     }
     It 'no manager type Employee' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'picard'
                 DistinguishedName = "CN=picard,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Service'
@@ -1089,7 +1089,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'kirk'
                 DistinguishedName = "CN=kirk,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Resource'
@@ -1097,7 +1097,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'spock'
                 DistinguishedName = "CN=spock,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Employee'
@@ -1105,7 +1105,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy/CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'norris'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Vendor'
@@ -1113,7 +1113,7 @@ Describe 'Users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'lswagger'
                 DistinguishedName = "CN=Lee Swagger\, Bob,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Vendor'
@@ -1129,14 +1129,14 @@ Describe 'Users' {
     }
     It 'manager of self' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'norrisc'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 Manager           = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'lswagger'
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 Manager           = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1151,34 +1151,34 @@ Describe 'Users' {
     } 
     It 'display name wrong' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris, Chuck (Braine L’Alleud) BEL"
                 EmployeeType      = 'Employee'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect plant user'
                 DisplayName       = "Norris, Chuck (Braine L’Alleud) BEL"
                 EmployeeType      = 'Plant'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect kiosk user'
                 DisplayName       = "Norris, Chuck (Braine L’Alleud) BEL"
                 EmployeeType      = 'Kiosk'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect resource account'
                 DisplayName       = 'wrong'
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Resource accounts/Dummy, CorrectUser (Somewhere) BEL'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect service account'
                 DisplayName       = 'wrong'
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1202,34 +1202,34 @@ Describe 'Users' {
     } 
     It 'duplicate display name' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = 'Marley, Bob'
                 EmployeeType      = 'Employee'
                 DistinguishedName = "CN=Marley\, Bob,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, User'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = 'Craig, Daniel'
                 DistinguishedName = "CN=Daniel\, Craig,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, User'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect'
                 DisplayName       = "Norris, Chuck (Braine L’Alleud) BEL"
                 EmployeeType      = 'Plant'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, User'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect'
                 DisplayName       = "Norris, Chuck (Braine L’Alleud) BEL"
                 EmployeeType      = 'Kiosk'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, User'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect'
                 DisplayName       = "Norris, Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1247,13 +1247,13 @@ Describe 'Users' {
     } 
     It 'TS Home directory does not exist' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 HomeDirectory     = $here
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect'
                 HomeDirectory     = 'Does not exit'
                 DistinguishedName = "CN=Incorrect,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1272,13 +1272,13 @@ Describe 'Users' {
     } 
     It 'TS profile does not exist' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 HomeDirectory     = $here
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Incorrect'
                 HomeDirectory     = 'Does not exit'
                 DistinguishedName = "CN=Incorrect,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1297,19 +1297,19 @@ Describe 'Users' {
     } 
     It 'employeeType not allowed' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'norrisc'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 employeeType      = 'Vendor'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'lswagger'
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 employeeType      = 'Unknown'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'cdaniel'
                 DistinguishedName = "CN=Daniel Craig\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
@@ -1327,13 +1327,13 @@ Describe 'Users' {
     } 
     It 'employeeType Vendor' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'cnorris'
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 employeeType      = 'Vendor'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'lswagger'
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
@@ -1348,7 +1348,7 @@ Describe 'Users' {
     It "HomeDirectory not starting with '\\GROUPHC.NET\BNL\HOME\'
             and excluding EmployeeType 'Service accounts' and 'Resource accounts'" {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'InCorrect'
                 DisplayName       = "Lee Swagger, Bob (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1357,7 +1357,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'InCorrect'
                 DisplayName       = "Lee Swagger, Bob (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1366,7 +1366,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1375,7 +1375,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1384,7 +1384,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1393,7 +1393,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Service'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1410,7 +1410,7 @@ Describe 'Users' {
     } 
     It "HomeDirectory set for EmployeeType 'Service' and 'Resource' when it's not needed" {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'InCorrect'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1419,7 +1419,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Service'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'InCorrect'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1428,7 +1428,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Resource'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Lee Swagger, Bob (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1437,7 +1437,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Lee Swagger, Bob (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Lee Swagger\, Bob (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1446,7 +1446,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1455,7 +1455,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1464,7 +1464,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Employee'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1473,7 +1473,7 @@ Describe 'Users' {
                 ScriptPath        = ''
                 employeeType      = 'Service'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'Correct'
                 DisplayName       = "Norris Chuck (Braine L’Alleud) BEL"
                 DistinguishedName = "CN=Norris\, Chuck (Braine L’Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
@@ -1492,7 +1492,7 @@ Describe 'Users' {
         It "OU 'Service accounts' needs to be 'Service' or 'Service - Description'" {
             Mock Get-ADUser {
                 'Some stuff that is not ok', 'Service account', 'apples', 'Service-' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Service'
                         Description       = $_
@@ -1502,7 +1502,7 @@ Describe 'Users' {
                         ScriptPath        = ''
                     }
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Service'
                     Description       = ''
@@ -1511,7 +1511,7 @@ Describe 'Users' {
                     DistinguishedName = 'contoso.com/EU/BEL/Service Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
                     ScriptPath        = ''
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Service'
                     Description       = $null
@@ -1521,7 +1521,7 @@ Describe 'Users' {
                     ScriptPath        = ''
                 }
                 'Service', 'Service - Something useful' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'CorrectUser'
                         EmployeeType      = 'Service'
                         Description       = $_
@@ -1543,7 +1543,7 @@ Describe 'Users' {
                 'Shared mailbox' or 'Shared mailbox - Description'" {
             Mock Get-ADUser {
                 'Some stuff that is not ok', 'Resource', 'Room', 'Meeting', 'Resource - ' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Resource'
                         Description       = $_
@@ -1553,7 +1553,7 @@ Describe 'Users' {
                         ScriptPath        = ''
                     }
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Resource'
                     Description       = ''
@@ -1562,7 +1562,7 @@ Describe 'Users' {
                     DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
                     ScriptPath        = ''
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Resource'
                     Description       = $null
@@ -1572,7 +1572,7 @@ Describe 'Users' {
                     ScriptPath        = ''
                 }
                 'Shared mailbox', 'Shared mailbox - Used for something', 'Meeting room', 'Meeting room - Room for meetings' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'CorrectUser'
                         EmployeeType      = 'Resource'
                         Description       = $_
@@ -1591,7 +1591,7 @@ Describe 'Users' {
         It "OU 'Users' with EmployeeType 'Kiosk' needs to be 'Kiosk' or 'Kiosk - Description'" {
             Mock Get-ADUser {
                 'Some stuff that is not ok', 'Kiosk account', 'kiosk', 'Kiosk - ' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Kiosk'
                         Description       = $_
@@ -1600,7 +1600,7 @@ Describe 'Users' {
                         DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                     }
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Kiosk'
                     Description       = ''
@@ -1608,7 +1608,7 @@ Describe 'Users' {
                     CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                     DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Kiosk'
                     Description       = $null
@@ -1617,7 +1617,7 @@ Describe 'Users' {
                     DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 }
                 'Kiosk', 'Kiosk - Used by Bob' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName = 'CorrectUser'
                         EmployeeType   = 'Kiosk'
                         Description    = $_
@@ -1634,7 +1634,7 @@ Describe 'Users' {
         It "OU 'Users' with EmployeeType 'Plant' needs to be 'Plant' or 'Plant - Description'" {
             Mock Get-ADUser {
                 'Some stuff that is not ok', 'Plant account', 'plant', 'Plant - ' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Plant'
                         Description       = $_
@@ -1643,7 +1643,7 @@ Describe 'Users' {
                         DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser{0} (Somewhere) BEL'
                     }
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Plant'
                     Description       = ''
@@ -1651,7 +1651,7 @@ Describe 'Users' {
                     CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                     DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Plant'
                     Description       = $null
@@ -1660,7 +1660,7 @@ Describe 'Users' {
                     DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 }
                 'Plant', 'Plant - Used by Bob' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'CorrectUser'
                         EmployeeType      = 'Plant'
                         Description       = $_
@@ -1678,7 +1678,7 @@ Describe 'Users' {
         It "OU 'Users' with EmployeeType 'Vendor' needs to be 'Vendor' or 'Vendor - Description'" {
             Mock Get-ADUser {
                 'Some stuff that is not ok', 'Vendor account', 'vendor', 'Vendor - ' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Vendor'
                         Description       = $_
@@ -1687,7 +1687,7 @@ Describe 'Users' {
                         DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                     }
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Vendor'
                     Description       = ''
@@ -1695,7 +1695,7 @@ Describe 'Users' {
                     CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                     DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Vendor'
                     Description       = $null
@@ -1704,7 +1704,7 @@ Describe 'Users' {
                     DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 }
                 'Vendor', 'Vendor - Used by Bob' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'CorrectUser'
                         EmployeeType      = 'Vendor'
                         Description       = $_
@@ -1723,7 +1723,7 @@ Describe 'Users' {
             Mock Get-ADUser {
                 'Some stuff that is ok', 'All text is good', 'kiwis', 'Kiosk - ',
                 'Vendor', 'Plant - Used by Bob' | ForEach-Object {
-                    New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                    @{
                         SamAccountName    = 'CorrectUser'
                         EmployeeType      = 'Employee'
                         Description       = $_
@@ -1732,7 +1732,7 @@ Describe 'Users' {
                         DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                     }
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'CorrectUser'
                     EmployeeType      = 'Employee'
                     Description       = ''
@@ -1740,7 +1740,7 @@ Describe 'Users' {
                     CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                     DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 }
-                New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+                @{
                     SamAccountName    = 'CorrectUser'
                     EmployeeType      = 'Employee'
                     Description       = $null
@@ -1763,7 +1763,7 @@ Describe 'GIT users' {
     }
     It 'no manager' {
         Mock Get-ADUser {
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'IncorrectUser'
                 Country           = 'BE'
                 Manager           = ''
@@ -1772,7 +1772,7 @@ Describe 'GIT users' {
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
-            New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
+            @{
                 SamAccountName    = 'IncorrectUser'
                 Country           = 'BE'
                 Manager           = $null

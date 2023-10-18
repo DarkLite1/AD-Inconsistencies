@@ -304,8 +304,14 @@ Begin {
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
             
-        [Array]$tmpGroups = foreach ($E in @($File.Group).where( {
-                    ($_.Type -eq 'Exclude') -or ($_.ListMembers) })) {
+        $tmpGroups = foreach (
+            $E in 
+            @($File.Group).where( {
+                ($_.Type -eq 'Exclude') -or ($_.ListMembers) }
+            )
+        ) {
+            Write-Verbose "Get group members '$($E.Name)'"
+
             [PSCustomObject]@{
                 Name        = $E.Name
                 Type        = $E.Type
