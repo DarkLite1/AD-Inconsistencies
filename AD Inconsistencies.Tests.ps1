@@ -859,7 +859,7 @@ Describe 'Groups' {
         Mock Get-ADGroupMember {
             throw 'Group members cannot be retrieved'
         } -ParameterFilter {
-            $PipelineVariable.SamAccountName -eq 'Group1'
+            $Identity.SamAccountName -eq 'Group1'
         }
 
         .$testScript @testParams

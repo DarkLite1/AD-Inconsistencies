@@ -246,7 +246,7 @@ Begin {
 
                     Try {
                         $groupMembers, $noDistinguishedName = @(
-                            Get-ADGroupMember $group -Recursive -EA Stop).Where( {
+                            Get-ADGroupMember -Identity $group -Recursive -EA Stop).Where( {
                                 $_.DistinguishedName
                             }, 'Split')
                     }
@@ -306,8 +306,14 @@ Begin {
             
         $tmpGroups = foreach (
             $E in 
-            @($File.Group).where( {
-                ($_.Type -eq 'Exclude') -or ($_.ListMembers) }
+            @($File.Group).where( 
+                {
+                    (
+                        ($_.Type -eq 'Exclude') -or 
+                        ($_.ListMembers)
+                    ) -and
+                    ($groupNonTraversable.SamAccountName -notContains $_.Name)
+                }
             )
         ) {
             Write-Verbose "Get group members '$($E.Name)'"
