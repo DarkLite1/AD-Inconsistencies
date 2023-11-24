@@ -1515,9 +1515,9 @@ Describe 'Users' {
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Service'
                     Description       = $null
-                    DisplayName       = 'Dummy, IncorrectUser{0} (Somewhere) BEL'
-                    CanonicalName     = 'contoso.com/EU/BEL/Service Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
-                    DistinguishedName = 'contoso.com/EU/BEL/Service Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
+                    DisplayName       = 'Dummy, IncorrectUser1 (Somewhere) BEL'
+                    CanonicalName     = 'contoso.com/EU/BEL/Service Accounts/Dummy, IncorrectUser1 (Somewhere) BEL'
+                    DistinguishedName = 'contoso.com/EU/BEL/Service Accounts/Dummy, IncorrectUser1 (Somewhere) BEL'
                     ScriptPath        = ''
                 }
                 'Service', 'Service - Something useful' | ForEach-Object {
@@ -1525,9 +1525,9 @@ Describe 'Users' {
                         SamAccountName    = 'CorrectUser'
                         EmployeeType      = 'Service'
                         Description       = $_
-                        DisplayName       = 'Dummy, CorrectUser{0} (Somewhere) BEL'
-                        CanonicalName     = 'contoso.com/EU/BEL/Service Accounts/Dummy, CorrectUser{0} (Somewhere) BEL'
-                        DistinguishedName = 'contoso.com/EU/BEL/Service Accounts/Dummy, CorrectUser{0} (Somewhere) BEL'
+                        DisplayName       = 'Dummy, CorrectUser (Somewhere) BEL'
+                        CanonicalName     = 'contoso.com/EU/BEL/Service Accounts/Dummy, CorrectUser (Somewhere) BEL'
+                        DistinguishedName = 'contoso.com/EU/BEL/Service Accounts/Dummy, CorrectUser (Somewhere) BEL'
                         ScriptPath        = ''
                     }
                 }
@@ -1536,7 +1536,7 @@ Describe 'Users' {
             .$testScript @testParams
 
             $AllObjects['User - DescriptionWrong'].Data.SamAccountName | Should -Be @(0..5).ForEach( { 'IncorrectUser' })
-        } 
+        }
         It "OU 'Resource accounts' needs to be
                 'Shared mailbox' or 'Shared mailbox  - Description',
                 'Meeting room' or 'Meeting room - Description',
@@ -1547,9 +1547,9 @@ Describe 'Users' {
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Resource'
                         Description       = $_
-                        DisplayName       = 'Dummy, IncorrectUser{0} (Somewhere) BEL'
-                        CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
-                        DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
+                        DisplayName       = 'Dummy, IncorrectUser (Somewhere) BEL'
+                        CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser (Somewhere) BEL'
+                        DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser (Somewhere) BEL'
                         ScriptPath        = ''
                     }
                 }
@@ -1557,18 +1557,18 @@ Describe 'Users' {
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Resource'
                     Description       = ''
-                    DisplayName       = 'Dummy, IncorrectUser{0} (Somewhere) BEL'
-                    CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
-                    DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
+                    DisplayName       = 'Dummy, IncorrectUser (Somewhere) BEL'
+                    CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser (Somewhere) BEL'
+                    DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser (Somewhere) BEL'
                     ScriptPath        = ''
                 }
                 New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                     SamAccountName    = 'IncorrectUser'
                     EmployeeType      = 'Resource'
                     Description       = $null
-                    DisplayName       = 'Dummy, IncorrectUser{0} (Somewhere) BEL'
-                    CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
-                    DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser{0} (Somewhere) BEL'
+                    DisplayName       = 'Dummy, IncorrectUser (Somewhere) BEL'
+                    CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser (Somewhere) BEL'
+                    DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, IncorrectUser (Somewhere) BEL'
                     ScriptPath        = ''
                 }
                 'Shared mailbox', 'Shared mailbox - Used for something', 'Meeting room', 'Meeting room - Room for meetings' | ForEach-Object {
@@ -1576,9 +1576,9 @@ Describe 'Users' {
                         SamAccountName    = 'CorrectUser'
                         EmployeeType      = 'Resource'
                         Description       = $_
-                        DisplayName       = 'Dummy, CorrectUser{0} (Somewhere) BEL'
-                        CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, CorrectUser{0} (Somewhere) BEL'
-                        DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, CorrectUser{0} (Somewhere) BEL'
+                        DisplayName       = 'Dummy, CorrectUser (Somewhere) BEL'
+                        CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, CorrectUser (Somewhere) BEL'
+                        DistinguishedName = 'contoso.com/EU/BEL/Resource Accounts/Dummy, CorrectUser (Somewhere) BEL'
                         ScriptPath        = ''
                     }
                 }
@@ -1586,8 +1586,9 @@ Describe 'Users' {
 
             .$testScript @testParams
 
-            $AllObjects['User - DescriptionWrong'].Data.SamAccountName | Should -Be @(0..6).ForEach( { 'IncorrectUser' })
-        } 
+            $AllObjects['User - DescriptionWrong'].Data.SamAccountName | 
+            Should -Be @(0..6).ForEach( { 'IncorrectUser' })
+        }
         It "OU 'Users' with EmployeeType 'Kiosk' needs to be 'Kiosk' or 'Kiosk - Description'" {
             Mock Get-ADUser {
                 'Some stuff that is not ok', 'Kiosk account', 'kiosk', 'Kiosk - ' | ForEach-Object {
@@ -1595,7 +1596,7 @@ Describe 'Users' {
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Kiosk'
                         Description       = $_
-                        DisplayName       = 'Dummy, IncorrectUser{0} (Somewhere) BEL'
+                        DisplayName       = 'Dummy, IncorrectUser (Somewhere) BEL'
                         CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                         DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                     }
@@ -1630,7 +1631,7 @@ Describe 'Users' {
             .$testScript @testParams
 
             $AllObjects['User - DescriptionWrong'].Data.SamAccountName | Should -Be @(0..5).ForEach( { 'IncorrectUser' })
-        } 
+        } -Tag test
         It "OU 'Users' with EmployeeType 'Plant' needs to be 'Plant' or 'Plant - Description'" {
             Mock Get-ADUser {
                 'Some stuff that is not ok', 'Plant account', 'plant', 'Plant - ' | ForEach-Object {
@@ -1638,9 +1639,9 @@ Describe 'Users' {
                         SamAccountName    = 'IncorrectUser'
                         EmployeeType      = 'Plant'
                         Description       = $_
-                        DisplayName       = 'Dummy, IncorrectUser{0} (Somewhere) BEL'
-                        CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser{0} (Somewhere) BEL'
-                        DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser{0} (Somewhere) BEL'
+                        DisplayName       = 'Dummy, IncorrectUser (Somewhere) BEL'
+                        CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
+                        DistinguishedName = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                     }
                 }
                 New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
@@ -1755,7 +1756,7 @@ Describe 'Users' {
             $AllObjects['User - DescriptionWrong'].Data.SamAccountName | Should -BeNullOrEmpty
         } 
     }
-} -tag test
+}
 Describe 'GIT users' {
     BeforeEach {
         $testInputFile | ConvertTo-Json | Out-File @testOutParams

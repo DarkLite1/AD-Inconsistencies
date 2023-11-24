@@ -1,4 +1,6 @@
 ﻿#Requires -Version 5.1
+#Requires -Modules Toolbox.HTML, Toolbox.EventLog, ImportExcel
+#Requires -Modules ActiveDirectory, Toolbox.ActiveDirectory
 
 <#
     .SYNOPSIS

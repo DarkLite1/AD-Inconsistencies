@@ -1,3 +1,7 @@
+#Requires -Version 5.1
+#Requires -Modules Toolbox.HTML, Toolbox.EventLog, Toolbox.Cherwell
+#Requires -Modules SqlServer
+
 <# 
     .SYNOPSIS
         Create tickets when needed
