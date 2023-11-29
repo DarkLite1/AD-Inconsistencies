@@ -20,8 +20,8 @@ BeforeAll {
     Mock Save-TicketInSqlHC
     Mock Send-MailHC
     Mock Write-EventLog
-    Mock Invoke-Sqlcmd2
-    Mock Invoke-Sqlcmd2 -ParameterFilter {
+    Mock Invoke-Sqlcmd
+    Mock Invoke-Sqlcmd -ParameterFilter {
         $Query -like "*FROM $SQLTableTicketsDefaults*"
     } -MockWith {
         [PSCustomObject]@{
@@ -35,13 +35,13 @@ Describe 'the mandatory parameters are' {
     It "<_>" -ForEach @(
         'ScriptName', 'Environment', 'TopicName', 'TopicDescription', 'Data'
     ) {
-        (Get-Command $testScript).Parameters[$_].Attributes.Mandatory | 
+        (Get-Command $testScript).Parameters[$_].Attributes.Mandatory |
         Should -BeTrue
     }
 }
 Describe 'an error is thrown when' {
     It 'no ticket default values are found in SQL' {
-        Mock Invoke-Sqlcmd2 -ParameterFilter {
+        Mock Invoke-Sqlcmd -ParameterFilter {
             $Query -like "*FROM $SQLTableTicketsDefaults*"
         }
 
@@ -57,9 +57,9 @@ Describe 'an error is thrown when' {
         $testNewParams.TicketFields = [PSCustomObject]@{
             incorrectFieldName = 'x'
         }
-        
+
         .$testScript @testNewParams
-        
+
         Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
             ($EntryType -eq 'Error') -and
             ($Message -like "*Field name 'incorrectFieldName' not found*")
@@ -70,7 +70,7 @@ Describe 'an error is thrown when' {
 }
 Describe 'create no ticket' {
     BeforeAll {
-        Mock Invoke-Sqlcmd2 -ParameterFilter {
+        Mock Invoke-Sqlcmd -ParameterFilter {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
             [PSCustomObject]@{
@@ -99,7 +99,7 @@ Describe 'create no ticket' {
 }
 Describe 'create a new ticket' {
     BeforeAll {
-        Mock Invoke-Sqlcmd2 -ParameterFilter {
+        Mock Invoke-Sqlcmd -ParameterFilter {
             $Query -like "*FROM $SQLTableTicketsDefaults*"
         } -MockWith {
             [PSCustomObject]@{
@@ -108,7 +108,7 @@ Describe 'create a new ticket' {
                 ServiceCountryCode = 'BNL'
             }
         }
-        Mock Invoke-Sqlcmd2 -ParameterFilter {
+        Mock Invoke-Sqlcmd -ParameterFilter {
             $Query -like "*FROM $SQLTableAdInconsistencies*"
         } -MockWith {
             [PSCustomObject]@{
@@ -130,9 +130,9 @@ Describe 'create a new ticket' {
     Context 'with properties from' {
         It 'SQL table ticketsDefaults when there are none in the .json file' {
             $testNewParams.TicketFields = $null
-            
+
             .$testScript @testNewParams
-            
+
             Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
                 ($KeyValuePair.RequesterSamAccountName -eq 'jack') -and
                 ($KeyValuePair.SubmittedBySamAccountName -eq 'mike') -and
@@ -145,9 +145,9 @@ Describe 'create a new ticket' {
                 SubmittedBySamAccountName = 'kirk'
                 ServiceCountryCode        = $null
             }
-            
+
             .$testScript @testNewParams
-            
+
             Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
                 ($KeyValuePair.RequesterSamAccountName -eq 'picard') -and
                 ($KeyValuePair.SubmittedBySamAccountName -eq 'kirk') -and

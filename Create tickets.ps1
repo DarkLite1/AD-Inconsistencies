@@ -2,10 +2,10 @@
 #Requires -Modules Toolbox.HTML, Toolbox.EventLog, Toolbox.Cherwell
 #Requires -Modules SqlServer
 
-<# 
+<#
     .SYNOPSIS
         Create tickets when needed
-        
+
     .DESCRIPTION
         Check if a ticket is already created for a specific topic and
         distinguished name. Only create a new ticket when there is no ticket
@@ -37,7 +37,7 @@
                     ManagerDisplayName    = ''
                     OU                    = 'contoso.com\USA\Users\actors\hero'
                 }
-            ) 
+            )
             TicketFields      = (
                 [PSCustomObject]@{
                     ShortDescription          = 'AD Inconsistency: Vendor account not expiring'
@@ -81,15 +81,16 @@ Begin {
         Write-EventLog @EventVerboseParams -Message $M
 
         $SQLParams = @{
-            ServerInstance    = $SQLServerInstance
-            Database          = $SQLDatabase
-            QueryTimeout      = '1000'
-            ConnectionTimeout = '20'
-            ErrorAction       = 'Stop'
+            ServerInstance         = $SQLServerInstance
+            Database               = $SQLDatabase
+            TrustServerCertificate = $true
+            QueryTimeout           = '1000'
+            ConnectionTimeout      = '20'
+            ErrorAction            = 'Stop'
         }
 
         #region Get SQL ticket default values
-        $SQLTicketDefaults = Invoke-Sqlcmd2 -As PSObject @SQLParams -Query "
+        $SQLTicketDefaults = Invoke-Sqlcmd @SQLParams -Query "
             SELECT *
             FROM $SQLTableTicketsDefaults
             WHERE ScriptName = '$ScriptName'"
@@ -117,7 +118,7 @@ Begin {
         }
 
         foreach (
-            $field in 
+            $field in
             $TicketFields.PSObject.Properties | Where-Object { $_.Value }
         ) {
             if (-not $KeyValuePair.containsKey($field.Name)) {
@@ -128,12 +129,12 @@ Begin {
         #endregion
 
         #region Get open tickets
-        $openTickets = Invoke-Sqlcmd2 @SQLParams -As PSObject -Query "
+        $openTickets = Invoke-Sqlcmd @SQLParams -Query "
             SELECT SamAccountName
             FROM $SQLTableAdInconsistencies
-            WHERE 
-                TopicName = '$TopicName' AND 
-                TicketRequestedDate IS NOT NULL AND 
+            WHERE
+                TopicName = '$TopicName' AND
+                TicketRequestedDate IS NOT NULL AND
                 TicketCloseDate IS NULL"
 
         $M = "Found $($openTickets.count) open tickets"
@@ -144,7 +145,7 @@ Begin {
     Catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
-        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; Exit
+        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; Exit 1
     }
 }
 
@@ -153,9 +154,9 @@ Process {
         $PSCode = $null
         $ticketDescription = $KeyValuePair.Description
         Foreach (
-            $D in 
-            $Data | Where-Object { 
-                $openTickets.SamAccountName -notContains $_.SamAccountName 
+            $D in
+            $Data | Where-Object {
+                $openTickets.SamAccountName -notContains $_.SamAccountName
             }
         ) {
             Try {
@@ -195,13 +196,13 @@ Process {
                     TicketNr     = $TicketNr
                 }
                 Save-TicketInSqlHC @SaveTicketParams
-                
-                Invoke-Sqlcmd2 @SQLParams -Query "
+
+                Invoke-Sqlcmd @SQLParams -Query "
                     INSERT INTO $SQLTableAdInconsistencies
-                    (PSCode, SamAccountName, TopicName, 
+                    (PSCode, SamAccountName, TopicName,
                     TicketRequestedDate, TicketNr)
                     VALUES(
-                    '$PSCode', $(FSQL $D.SamAccountName), 
+                    '$PSCode', $(FSQL $D.SamAccountName),
                     $(FSQL $TopicName), $(FSQL $TicketRequestedDate), '$TicketNr')"
                 #endregion
             }
@@ -219,6 +220,6 @@ Process {
     Catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
-        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"
+        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; Exit 1
     }
 }
