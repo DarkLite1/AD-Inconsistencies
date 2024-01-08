@@ -207,7 +207,7 @@ Process {
                 #endregion
             }
             Catch {
-                throw "Failed creating a ticket for TopicName '$TopicName' SamAccountName '$($_.Name)': $_"
+                throw "Failed creating a ticket for TopicName '$TopicName' SamAccountName '$($D.SamAccountName)': $_"
             }
         }
 
