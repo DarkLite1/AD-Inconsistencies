@@ -1,0 +1,116 @@
+{
+  "MailTo": ["bob@contoso.com"],
+  "InactiveDays": 40,
+  "Prefix": {
+    "QuotaGroup": "Quota group"
+  },
+  "RolGroup": {
+    "Prefix": "ROL group -",
+    "PlaceHolderAccount": "master"
+  },
+  "AllowedEmployeeType": ["Vendor", "Plant"],
+  "Group": [
+    {
+      "Name": "Leaver group",
+      "Type": "Exclude",
+      "ListMembers": true
+    },
+    {
+      "Name": "Deprovision group",
+      "Type": null,
+      "ListMembers": true
+    }
+  ],
+  "OU": [
+    "OU=BEL,OU=EU,DC=contoso,DC=com",
+    "OU=LUX,OU=EU,DC=contoso,DC=com",
+    "OU=NLD,OU=EU,DC=contoso,DC=com"
+  ],
+  "Git": {
+    "OU": "OU=GIT,DC=contoso,DC=com",
+    "CountryCode": ["BE", "LU", "NL"]
+  },
+  "Tickets": {
+    "Computer - EnabledInDisabledOU": {
+      "ShortDescription": "AD Inconsistency: Computer enabled in disabled OU",
+      "Description": "Please disable the computer account in AD."
+    },
+    "GitUser - NoManger": {
+      "ShortDescription": "AD Inconsistency: GIT account without manager",
+      "Description": "Please add the correct manager for the GIT account."
+    },
+    "Group - CircularGroups": {
+      "ShortDescription": "AD Inconsistency: Group with circular membership",
+      "Description": "Please check the group for members. This group is also member of one of the member groups."
+    },
+    "Group - GroupsWithOrphans": {
+      "ShortDescription": "AD Inconsistency: Group with orphaned member",
+      "Description": "Please remove the member account that is no longer a valid AD account."
+    },
+    "Group - NonTraversableGroups": {
+      "ShortDescription": "AD Inconsistency: Group not traversable",
+      "Description": "Please remove members from the group that are not contoso.NET domain accounts."
+    },
+    "RolGroup - CN": {
+      "ShortDescription": "AD Inconsistency: Group name and cn not equal",
+      "Description": "Please correct the 'Name' or 'Common Name' property of the ROL group so they are both the same."
+    },
+    "RolGroup - GroupCategory": {
+      "ShortDescription": "AD Inconsistency: Group category not of type 'security'",
+      "Description": "Please correct the group property 'Category' to 'Security'."
+    },
+    "RolGroup - GroupScope": {
+      "ShortDescription": "AD Inconsistency: Group scope not 'universal'",
+      "Description": "Please correct the group property 'Group scope' to 'Universal'.",
+      "Exclude": ["Group 1", "Group 2", "Group 3"]
+    },
+    "RolGroup - PlaceHolder": {
+      "ShortDescription": "AD Inconsistency: Placeholder account missing in ROL group",
+      "Description": "Please add SamAccountName 'belsrvc' as member."
+    },
+    "User - CountryNotMatchingOU": {
+      "ShortDescription": "AD Inconsistency: User country not equal to the OU country",
+      "Description": "Please correct the property 'Country' of the user to be the same as the AD organizational unit where the user account is located."
+    },
+    "User - DisplayNameNotUnique": {
+      "ShortDescription": "AD Inconsistency: User display name not unique",
+      "Description": "Please correct the property 'DisplayName' of the user so it is unique."
+    },
+    "User - EmployeeTypeBlank": {
+      "ShortDescription": "AD Inconsistency: User employee type is missing",
+      "Description": "Please fill in the property 'EmployeeType'."
+    },
+    "User - HomeDircontoso": {
+      "ShortDescription": "AD Inconsistency: User HomeDirectory incorrect",
+      "Description": "Please update the 'HomeDirectory' so it starts with '\\\\contoso.NET\\' instead of '\\\\contoso\\'"
+    },
+    "User - ManagerOfSelf": {
+      "ShortDescription": "AD Inconsistency: User is manager of his own account",
+      "Description": "Please fill in the correct manager for the user."
+    },
+    "User - NoManager": {
+      "ShortDescription": "AD Inconsistency: User has no manager",
+      "Description": "Please fill in the correct manager for the user."
+    },
+    "User - StartEndWithSpaces": {
+      "ShortDescription": "AD Inconsistency: User first or last name incorrect",
+      "Description": "Please remove the space at the beginning or end of the first or last name of the user."
+    },
+    "User - TSHomeDircontoso": {
+      "ShortDescription": "AD Inconsistency: TS home dir contoso not contoso.NET",
+      "Description": "Please update the terminal services profile folder to use 'contoso.NET' instead of 'contoso'."
+    },
+    "User - TSProfilecontoso": {
+      "ShortDescription": "AD Inconsistency: User terminal services profile incorrect",
+      "Description": "Please change the terminal services profile to use 'contoso.NET' instead of 'contoso'."
+    },
+    "User - VendorsNotExpiring": {
+      "ShortDescription": "AD Inconsistency: Vendor account expiration date incorrect",
+      "Description": "Please set the account expiration date to be less than one year from now."
+    },
+    "User - LogonScriptNotExisting": {
+      "ShortDescription": "AD Inconsistency: User logon script not found",
+      "Description": "Please update the user logon script to an existing path ('\\\\CONTOSO.NET\\NETLOGON\\..') or make it blank when no logon script is needed."
+    }
+  }
+}
