@@ -12,8 +12,8 @@
     .PARAMETER ImportFile
         A .json file containing the script arguments.
 
-        When the key 'Tickets' is used, a ticket will be created for that 
-        specific topic. 
+        When the key 'Tickets' is used, a ticket will be created for that
+        specific topic.
 
         Ex.
         {
@@ -58,9 +58,9 @@
 
     .PARAMETER NoEmail
         When 'NoEmail' is used then the report will not be mailed to the
-        addresses in MailTo. 
-        
-        This can be useful in case the script needs to run every day to create 
+        addresses in MailTo.
+
+        This can be useful in case the script needs to run every day to create
         the required tickets, but there's no need to send a report by mail every day.
 #>
 
@@ -203,8 +203,8 @@ Begin {
             }
 
             if (
-                (-not $OuCountry[-1].Country) -or 
-                ($null -eq $OuCountry[-1].Country) -or 
+                (-not $OuCountry[-1].Country) -or
+                ($null -eq $OuCountry[-1].Country) -or
                 ($null -eq $OuCountry[-1].OU)
             ) {
                 throw "The AD Organizational Unit '$O' is incomplete. OU '$($OuCountry[-1].OU)' has country '$($OuCountry[-1].Country)'"
@@ -235,7 +235,7 @@ Begin {
             $adGroupParams = @{
                 Filter     = '*'
                 SearchBase = $O
-                Properties = @('CanonicalName', 'CN', 'Description', 
+                Properties = @('CanonicalName', 'CN', 'Description',
                     'DisplayName', 'Mail', 'ManagedBy')
             }
             foreach ($group in (Get-ADGroup @adGroupParams)) {
@@ -257,7 +257,7 @@ Begin {
                         $Error.RemoveAt(0)
                         Continue
                     }
-                    
+
                     if ($noDistinguishedName) {
                         $groupsWithOrphans += $key
                     }
@@ -279,11 +279,11 @@ Begin {
             Write-EventLog @EventVerboseParams -Message $M
 
             $allAdUsers += @(
-                Get-ADUser -Filter * -SearchBase $O -Properties whenCreated, displayName, 
+                Get-ADUser -Filter * -SearchBase $O -Properties whenCreated, displayName,
                 sn, Title, Department, Company, manager, EmployeeID, extensionAttribute8,
                 employeeType, CanonicalName, Description, co, physicalDeliveryOfficeName,
-                OfficePhone, HomePhone, MobilePhone, ipPhone, Fax, pager, info, 
-                EmailAddress, scriptPath, homeDirectory, AccountExpirationDate, 
+                OfficePhone, HomePhone, MobilePhone, ipPhone, Fax, pager, info,
+                EmailAddress, scriptPath, homeDirectory, AccountExpirationDate,
                 LastLogonDate, PasswordExpired, PasswordNeverExpires, LockedOut |
                 Select-Object -Property *,
                 @{N = 'LastName'; E = { $_.sn } },
@@ -305,13 +305,13 @@ Begin {
         $M = "Get group members for excluded groups and listing groups in OU '$O'"
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
-            
+
         $tmpGroups = foreach (
-            $E in 
-            @($File.Group).where( 
+            $E in
+            @($File.Group).where(
                 {
                     (
-                        ($_.Type -eq 'Exclude') -or 
+                        ($_.Type -eq 'Exclude') -or
                         ($_.ListMembers)
                     ) -and
                     ($groupNonTraversable.SamAccountName -notContains $_.Name)
@@ -457,17 +457,17 @@ Process {
 
         $i = 0
         $MembersNotInOU = foreach ($G in $allAdGroups.GetEnumerator()) {
-            $foreignUsers = $G.Value.Where( { 
-                    ($_.ObjectClass -eq 'user') -and 
+            $foreignUsers = $G.Value.Where( {
+                    ($_.ObjectClass -eq 'user') -and
                     ($_.distinguishedName -notmatch $ouFilter )
                 })
 
             if ($foreignUsers) {
                 $i++
-                $foreignUsers | 
+                $foreignUsers |
                 Select-Object @{Name = 'GroupName'; Expression = { $G.Key.SamAccountName } },
-                @{Name = 'UserSamAccountName'; Expression = { $_.SamAccountName } }, 
-                @{Name = 'UserName'; Expression = { $_.Name } }, 
+                @{Name = 'UserSamAccountName'; Expression = { $_.SamAccountName } },
+                @{Name = 'UserName'; Expression = { $_.Name } },
                 OU
             }
         }
@@ -567,7 +567,7 @@ Process {
             }
 
             $RolGroupType = 'RolGroup'
-            
+
             Write-Verbose 'Get ROL group incorrect'
             $AllObjects['RolGroup - Incorrect'] = @{
                 Description      = "Incorrect ROL groups"
@@ -606,8 +606,8 @@ Process {
                 WorksheetName    = 'GroupScopeNotUniversal'
                 PropertyToExport = 'Name', 'Description', 'OU', 'GroupScope'
                 Type             = $RolGroupType
-                Data             = $RolGroupsIncorrect.where( 
-                    { 
+                Data             = $RolGroupsIncorrect.where(
+                    {
                         $_.Problem -contains 'GroupScope'
                     }
                 )
@@ -899,7 +899,7 @@ Process {
             WorksheetName    = 'NoManager'
             PropertyToExport = 'SamAccountName', 'Name', 'DisplayName', 'ManagerDisplayName', 'OU'
             Type             = 'User'
-            Data             = $Users.Where( { 
+            Data             = $Users.Where( {
                     (-not $_.Manager) -and
                     ($_.EmployeeType -ne 'Employee') -and
                     ($_.EmployeeType -ne 'Resource') -and
@@ -914,7 +914,7 @@ Process {
             WorksheetName    = 'NoManagerEmployee'
             PropertyToExport = 'SamAccountName', 'Name', 'DisplayName', 'ManagerDisplayName', 'OU'
             Type             = 'User'
-            Data             = $Users.Where( { 
+            Data             = $Users.Where( {
                     (-not $_.Manager) -and
                     ($_.EmployeeType -eq 'Employee')
                 }
@@ -1089,12 +1089,12 @@ Process {
             Write-Verbose "Get users from GIT OU '$GitOU'"
 
             $GitUsers = @(Get-ADUser -SearchBase $GitOU -Filter $GitSearchCountries -Properties LastLogonDate,
-                WhenCreated, Country, CanonicalName, manager | 
+                WhenCreated, Country, CanonicalName, manager |
                 Select-Object *,
                 @{N = 'OU'; E = { ConvertTo-OuNameHC $_.CanonicalName } },
                 @{
-                    N = 'ManagerDisplayName'; 
-                    E = { if ($_.manager) { Get-ADDisplayNameHC $_.manager } } 
+                    N = 'ManagerDisplayName';
+                    E = { if ($_.manager) { Get-ADDisplayNameHC $_.manager } }
                 }
             )
 
@@ -1118,9 +1118,9 @@ Process {
                 PropertyToExport = 'Name', 'SamAccountName', 'ManagerDisplayName', 'LastLogonDate',
                 'WhenCreated', 'Country', 'Enabled', 'OU'
                 Type             = 'GitUser'
-                Data             = $GitUsers.where( 
-                    { 
-                    ($_.Enabled) -and (-not $_.manager) 
+                Data             = $GitUsers.where(
+                    {
+                    ($_.Enabled) -and (-not $_.manager)
                     }
                 )
             }
@@ -1182,7 +1182,7 @@ End {
             $M = "Export source data to Excel file '$($ExcelParams.Path)'"
             Write-Verbose $M
             Write-EventLog @EventVerboseParams -Message $M
-        
+
             $MailParams.Attachments += $ExcelParams.Path
 
             if ($Computers) {
@@ -1222,7 +1222,7 @@ End {
         $GitUsersHtmlList = $GroupMembersHtmlList = @()
 
         #region Test for incorrect ticket topic
-        $File.Tickets | Get-Member -MemberType NoteProperty -EA Ignore | 
+        $File.Tickets | Get-Member -MemberType NoteProperty -EA Ignore |
         Where-Object {
             $AllObjects.GetEnumerator().Name -notContains $_.Name
         } | ForEach-Object {
@@ -1231,7 +1231,7 @@ End {
         #endregion
 
         foreach (
-            $A in 
+            $A in
             $AllObjects.GetEnumerator() | Sort-Object { $_.Value.WorkSheetName }
         ) {
             Write-Verbose "Type '$($A.Value.Type)' worksheet '$($A.Value.WorksheetName)' item '$($A.Key)' data '$(@($A.Value.Data).Count)'"
@@ -1252,7 +1252,7 @@ End {
             $createTicket = $false
 
             if (
-                $File.Tickets | 
+                $File.Tickets |
                 Get-Member -Name $A.Name -MemberType NoteProperty -EA Ignore
             ) {
                 $createTicket = $true
@@ -1262,10 +1262,10 @@ End {
             #region Create email table rows and Excel file name
             $HtmlListItem = '<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>' -f
             $(
-                if ($A.Value['Count']) { $A.Value['Count'] } 
+                if ($A.Value['Count']) { $A.Value['Count'] }
                 else { @($A.Value.Data).Count }
-            ), 
-            $A.Value.WorksheetName, 
+            ),
+            $A.Value.WorksheetName,
             $(
                 if ($createTicket) { $A.Value.Description + '<br><b>(AUTO TICKET)</b>' }
                 else { $A.Value.Description }
@@ -1315,11 +1315,12 @@ End {
                         Script           = $scriptCreateTicketsItem.FullName
                         TopicName        = $A.Name
                         TopicDescription = $A.Value.Description
-                        TicketFields     = $File.Tickets."$($A.Name)"
+                        TicketFields     = $File.Tickets."$($A.Name)" |
+                        Select-Object -ExcludeProperty 'Exclude'
                         Data             = $A.Value.Data | Select-Object (
                             @('SamAccountName') +
                             (
-                                $A.Value.PropertyToExport | 
+                                $A.Value.PropertyToExport |
                                 Where-Object { $_ -ne 'SamAccountName' }
                             )
                         )
@@ -1339,7 +1340,7 @@ End {
                     $A.Value.Data | Select-Object $A.Value.PropertyToExport |
                     Export-Excel @ExcelParams
                     #endregion
-                
+
                     $MailParams.Attachments += $ExcelParams.Path
                 }
             }
@@ -1438,7 +1439,7 @@ $(if($ExcludedGroups) {
 
         if ($error) {
             # $Error | Select-Object @{N = 'M'; E = { $_.Exception.Message + $_.ScriptStackTrace } } | Select-Object -ExpandProperty M |
-            $HTMLErrors = $Error.Exception.Message | Sort-Object -Unique | 
+            $HTMLErrors = $Error.Exception.Message | Sort-Object -Unique |
             ConvertTo-HtmlListHC -Spacing Wide -Header 'Errors detected:'
             $MailParams.Message += $HTMLErrors
 
