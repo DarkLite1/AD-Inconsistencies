@@ -64,7 +64,7 @@
         the required tickets, but there's no need to send a report by mail every day.
 #>
 
-Param (
+param (
     [Parameter(Mandatory)]
     [String]$ScriptName,
     [Parameter(Mandatory)]
@@ -78,8 +78,8 @@ Param (
     )
 )
 
-Begin {
-    Function Get-PathItemHC {
+begin {
+    function Get-PathItemHC {
         <#
         .SYNOPSIS
             Get the path item from a relative or absolute path
@@ -92,7 +92,7 @@ Begin {
 
             Perform Get-Item on the script 'copy.ps1' in the current directory
         #>
-        Param (
+        param (
             [Parameter(Mandatory)]
             [string]$Leaf,
             $Parent = $PSScriptRoot
@@ -104,8 +104,8 @@ Begin {
             Get-Item -LiteralPath $Leaf -EA Stop
         }
     }
-    Function Start-TicketCreationScriptHC {
-        Param (
+    function Start-TicketCreationScriptHC {
+        param (
             [Parameter(Mandatory)]
             [ValidateScript({ Test-Path -LiteralPath $_ })]
             [String]$Script,
@@ -121,7 +121,7 @@ Begin {
         & $Script -ScriptName $ScriptName -Environment 'Prod' -TopicName $TopicName -TopicDescription $TopicDescription -Data $Data -TicketFields $TicketFields -TicketRequestedDate $Now
     }
 
-    Try {
+    try {
         $Error.Clear()
         Import-EventLogParamsHC -Source $ScriptName
         Write-EventLog @EventStartParams
@@ -137,7 +137,7 @@ Begin {
             }
             $logFile = New-LogFileNameHC @LogParams
         }
-        Catch {
+        catch {
             throw "Failed creating the log folder '$LogFolder': $_"
         }
         #endregion
@@ -173,10 +173,10 @@ Begin {
         #endregion
 
         #region Get tickets file
-        Try {
+        try {
             $scriptCreateTicketsItem = Get-PathItemHC -Leaf $ScriptCreateTicketsFile
         }
-        Catch {
+        catch {
             throw "Create tickets script file '$ScriptCreateTicketsFile' not found"
         }
         #endregion
@@ -188,9 +188,9 @@ Begin {
         $allAdGroups = @{ }
         $i = 0
 
-        Foreach ($O in $OU) {
+        foreach ($O in $OU) {
             #region Match OU with country name
-            Try {
+            try {
                 Write-Verbose 'Match OU with country name'
                 $ADou = Get-ADOrganizationalUnit $O -Properties Description, Country, CanonicalName
                 $OuCountry += [PSCustomObject]@{
@@ -198,7 +198,7 @@ Begin {
                     Country = $ADou.Description
                 }
             }
-            Catch {
+            catch {
                 throw "Input file '$ImportFile': OU '$O' does not exist: $_"
             }
 
@@ -239,23 +239,23 @@ Begin {
                     'DisplayName', 'Mail', 'ManagedBy')
             }
             foreach ($group in (Get-ADGroup @adGroupParams)) {
-                Try {
+                try {
                     $i++
                     Write-Verbose "$i Get group members '$($group.name)'"
 
                     $key = $group | Select-Object *,
                     @{N = 'ManagedByDisplayName'; E = { if ($_.ManagedBy) { Get-ADDisplayNameHC $_.ManagedBy } } }, @{N = 'OU'; E = { ConvertTo-OuNameHC $_.CanonicalName } }
 
-                    Try {
+                    try {
                         $groupMembers, $noDistinguishedName = @(
                             Get-ADGroupMember -Identity $group -Recursive -EA Stop).Where( {
                                 $_.DistinguishedName
                             }, 'Split')
                     }
-                    Catch {
+                    catch {
                         $groupNonTraversable += $key
                         $Error.RemoveAt(0)
-                        Continue
+                        continue
                     }
 
                     if ($noDistinguishedName) {
@@ -266,7 +266,7 @@ Begin {
                         @{N = 'OU'; E = { ConvertTo-OuNameHC $_.DistinguishedName -EA Stop } }
                     )
                 }
-                Catch {
+                catch {
                     Write-Error "Failed creating a group object for group '$($group.Name)': $_"
                     $Error.RemoveAt(1)
                 }
@@ -314,7 +314,7 @@ Begin {
                         ($_.Type -eq 'Exclude') -or
                         ($_.ListMembers)
                     ) -and
-                    ($groupNonTraversable.SamAccountName -notContains $_.Name)
+                    ($groupNonTraversable.SamAccountName -notcontains $_.Name)
                 }
             )
         ) {
@@ -349,26 +349,26 @@ Begin {
         #endregion
 
         $Users = $allAdUsers.Where( {
-                ($_.CanonicalName -NotMatch '/Terminated users/|/Disabled/') -and
-                ($ExcludedGroups.Members.SamAccountName -notContains $_.SamAccountName)
+                ($_.CanonicalName -notmatch '/Terminated users/|/Disabled/') -and
+                ($ExcludedGroups.Members.SamAccountName -notcontains $_.SamAccountName)
             })
 
         $Groups = $allAdGroups.Keys
     }
-    Catch {
+    catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject 'FAILURE' -Priority 'High' -Message $_ -Header $ScriptName
         Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"
-        Write-EventLog @EventEndParams; Exit 1
+        Write-EventLog @EventEndParams; exit 1
     }
 }
 
-Process {
-    Try {
+process {
+    try {
         $AllObjects = @{ }
 
         #region Computers
-        $M = "Get all computers with issues"
+        $M = 'Get all computers with issues'
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
 
@@ -385,7 +385,7 @@ Process {
             Type             = 'Computer'
             Data             = $Computers.where( {
                     ($_.OU -notmatch 'Terminated|Disabled') -and ($_.Enabled -eq $true) -and
-                    (($_.LastLogonDate -EQ $null) -or ($_.LastLogonDate -LE $CompareDate))
+                    (($_.LastLogonDate -eq $null) -or ($_.LastLogonDate -le $CompareDate))
                 })
         }
 
@@ -400,7 +400,7 @@ Process {
         #endregion
 
         #region Groups
-        $M = "Get all groups with issues"
+        $M = 'Get all groups with issues'
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
 
@@ -429,7 +429,7 @@ Process {
         #region CircularGroups
         Write-Verbose 'Get group CircularGroups'
         $AllObjects['Group - CircularGroups'] = @{
-            Description      = "Circular group membership"
+            Description      = 'Circular group membership'
             WorksheetName    = 'CircularGroups'
             PropertyToExport = 'Name', 'DisplayName', 'Description', 'GroupCategory', 'GroupScope', 'OU'
             Type             = 'Group'
@@ -473,7 +473,7 @@ Process {
         }
 
         $AllObjects['Group - MembersNotInOU'] = @{
-            Description      = "Groups with members not in OU"
+            Description      = 'Groups with members not in OU'
             WorksheetName    = 'MembersNotInOU'
             PropertyToExport = 'GroupName', 'UserName', 'UserSamAccountName', 'OU'
             Type             = 'Group'
@@ -486,7 +486,7 @@ Process {
         foreach ($G in $GroupMembers) {
             Write-Verbose "Get group member list '$G'"
             $AllObjects["GroupMembers - $($G.Name)"] = @{
-                Description      = "List of group members"
+                Description      = 'List of group members'
                 WorksheetName    = $G.Name
                 PropertyToExport = 'SamAccountName', 'Name', 'Enabled', 'Description', 'LastLogonDate',
                 'AccountExpirationDate', 'EmployeeType', 'homeDirectory', 'manager', 'OU'
@@ -502,7 +502,7 @@ Process {
             $RolGroups = $Groups.where( { $_.SamAccountName -like "$RolGroupPrefix*" })
 
 
-            [Array]$RolGroupsIncorrect = Foreach ($G in $RolGroups) {
+            [Array]$RolGroupsIncorrect = foreach ($G in $RolGroups) {
                 Write-Verbose "ROL Group '$($G.SamAccountName)'"
 
                 $Problem = @()
@@ -527,7 +527,7 @@ Process {
                 #region GroupScope
                 if (
                     ($G.GroupScope -ne 'Universal') -and
-                    ($file.Tickets.'RolGroup - GroupScope'.Exclude -notContains $G.SamAccountName)
+                    ($file.Tickets.'RolGroup - GroupScope'.Exclude -notcontains $G.SamAccountName)
                 ) {
                     $Problem += 'GroupScope'
                 }
@@ -570,7 +570,7 @@ Process {
 
             Write-Verbose 'Get ROL group incorrect'
             $AllObjects['RolGroup - Incorrect'] = @{
-                Description      = "Incorrect ROL groups"
+                Description      = 'Incorrect ROL groups'
                 WorksheetName    = 'ROL_Groups_incorrect'
                 PropertyToExport = 'Name', 'CN', 'DisplayName', 'Description',
                 'GroupCategory', 'GroupScope',
@@ -654,17 +654,17 @@ Process {
         #endregion
 
         #region Users
-        $M = "Get all users with issues"
+        $M = 'Get all users with issues'
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
 
         Write-Verbose 'Get user CountryNotMatchingOU'
         $AllObjects['User - CountryNotMatchingOU'] = @{
-            Description      = "Country name not equal to the OU country name"
+            Description      = 'Country name not equal to the OU country name'
             WorksheetName    = 'CountryNotMatchingOU'
             PropertyToExport = 'SamAccountName', 'Name', 'Description', 'EmployeeType', 'co', 'OU'
             Type             = 'User'
-            Data             = Foreach ($User in $Users) {
+            Data             = foreach ($User in $Users) {
                 if (($OuCountry.where( { $User.OU -like "$($_.OU)\*" }).Country) -ne $User.co) {
                     $User
                 }
@@ -677,8 +677,8 @@ Process {
             WorksheetName    = 'DescriptionWrong'
             PropertyToExport = 'SamAccountName', 'Name', 'Description', 'EmployeeType', 'co', 'OU'
             Type             = 'User'
-            Data             = Foreach ($User in $Users) {
-                $DescriptionWrong = Switch -Regex ($User.OU) {
+            Data             = foreach ($User in $Users) {
+                $DescriptionWrong = switch -Regex ($User.OU) {
                     '\\Resource Accounts$' {
                         -not (($User.Description -ceq 'Shared mailbox') -or ($User.Description -clike 'Shared mailbox - ?*') -or
                             ($User.Description -ceq 'Meeting room') -or ($User.Description -clike 'Meeting room - ?*'))
@@ -689,7 +689,7 @@ Process {
                         break
                     }
                     '\\Users$' {
-                        Switch -Regex ($User.EmployeeType) {
+                        switch -Regex ($User.EmployeeType) {
                             'Vendor|Kiosk|Plant' {
                                 -not (($User.Description -ceq $_) -or ($User.Description -clike "$_ - ?*"))
                                 break
@@ -720,8 +720,8 @@ Process {
             WorksheetName    = 'DisplayNameWrong'
             PropertyToExport = 'SamAccountName', 'Name', 'Description', 'EmployeeType', 'co', 'OU'
             Type             = 'User'
-            Data             = Foreach ($User in $Users) {
-                $DisplayNameWrong = Switch -Regex ($User.OU) {
+            Data             = foreach ($User in $Users) {
+                $DisplayNameWrong = switch -Regex ($User.OU) {
                     '\\Resource Accounts$' {
                         $(Compare-ADobjectNameHC $User.DisplayName -Type ResourceAccount).Valid
                         break
@@ -837,8 +837,8 @@ Process {
             Type             = 'User'
             Data             = $Users.where( {
                     ($_.EmployeeType -ne 'Resource') -and
-                    (($_.whenCreated -LE $CompareDate) -and
-                        (($_.LastLogonDate -EQ $null) -or ($_.LastLogonDate -LE $CompareDate))) })
+                    (($_.whenCreated -le $CompareDate) -and
+                    (($_.LastLogonDate -eq $null) -or ($_.LastLogonDate -le $CompareDate))) })
         }
 
         Write-Verbose 'Get user LogonScriptBlank'
@@ -860,12 +860,12 @@ Process {
             PropertyToExport = 'SamAccountName', 'Name', 'LogonScript', 'ManagerDisplayName', 'OU'
             Type             = 'User'
             Data             = @($Users.Where( { $_.LogonScript }) | Group-Object LogonScript).Where( { $_.Name }).foreach( {
-                    Try {
+                    try {
                         if (-not (Test-Path -Path "\\$env:USERDNSDOMAIN\NETLOGON\$($_.Name)" -PathType Leaf)) {
                             $_.Group
                         }
                     }
-                    Catch {
+                    catch {
                         Write-Warning "Access denied for logon script '$($_.Name)'"
                         $_.Group | Select-Object -ExcludeProperty LogonScript -Property *,
                         @{N = 'LogonScript'; E = { ('ACCESS DENIED:' + $_.LogonScript) } }
@@ -886,7 +886,7 @@ Process {
 
         Write-Verbose 'Get user ManagerOfSelf'
         $AllObjects['User - ManagerOfSelf'] = @{
-            Description      = "Manager same as user account"
+            Description      = 'Manager same as user account'
             WorksheetName    = 'ManagerOfSelf'
             PropertyToExport = 'SamAccountName', 'Name', 'DisplayName', 'ManagerDisplayName', 'OU'
             Type             = 'User'
@@ -936,14 +936,14 @@ Process {
             WorksheetName    = 'TSHomeDirNotExist'
             PropertyToExport = 'SamAccountName', 'Name', 'TSHomeDirectory', 'TSHomeDirExist', 'OU'
             Type             = 'User'
-            Data             = Foreach ($User in $Users) {
+            Data             = foreach ($User in $Users) {
                 $TSHomeDirExist = $null
 
                 if (($null -ne $User.TSHomeDirectory) -and ($User.TSHomeDirectory -ne '')) {
-                    Try {
+                    try {
                         $TSHomeDirExist = Test-Path -Path $User.TSHomeDirectory -PathType Container
                     }
-                    Catch {
+                    catch {
                         $TSHomeDirExist = $false
                         $Error.RemoveAt(0)
                         Write-Warning "Access denied on the TS Home directory '$($User.TSHomeDirectory)' of user '$($User.DisplayName)'"
@@ -992,15 +992,15 @@ Process {
             WorksheetName    = 'TSProfileNotExisting'
             PropertyToExport = 'SamAccountName', 'Name', 'TSUserProfile', 'TSUserProfileExist', 'ManagerDisplayName', 'OU'
             Type             = 'User'
-            Data             = Foreach ($User in $Users) {
+            Data             = foreach ($User in $Users) {
                 $TSUserProfileExist = $TSUserProfileV2Exist = $null
 
                 if (($null -ne $User.TSUserProfile) -and ($User.TSUserProfile -ne '')) {
                     #region Srv 2003
-                    Try {
+                    try {
                         $TSUserProfileExist = Test-Path -Path $User.TSUserProfile -PathType Container
                     }
-                    Catch {
+                    catch {
                         $TSUserProfileExist = $false
                         $Error.RemoveAt(0)
                         Write-Warning "Access denied on the TS User Profile '$($User.TSUserProfile)' of user '$($User.DisplayName)'"
@@ -1008,10 +1008,10 @@ Process {
                     #endregion
 
                     #region Srv 2008
-                    Try {
+                    try {
                         $TSUserProfileV2Exist = Test-Path -Path "$($User.TSUserProfile).V2"-PathType Container
                     }
-                    Catch {
+                    catch {
                         $TSUserProfileV2Exist = $false
                         $Error.RemoveAt(0)
                         Write-Warning "Access denied on the TS User Profile.V2 '$($User.TSUserProfile).V2 of user '$($User.DisplayName)'"
@@ -1033,7 +1033,7 @@ Process {
             PropertyToExport = 'DisplayName', 'SamAccountName', 'AccountExpirationDate', 'EmployeeType', 'ManagerDisplayName', 'OU'
             Type             = 'User'
             Data             = $Users.Where( {
-                    ($_.EmployeeType -EQ 'Vendor') -and
+                    ($_.EmployeeType -eq 'Vendor') -and
                     (($_.AccountExpirationDate -eq $null) -or ($_.AccountExpirationDate -gt $YearAheadDate)) })
         }
 
@@ -1043,7 +1043,7 @@ Process {
             $UserProperties = @('Name', 'Description', 'Enabled', 'OperatingSystem',
                 'LastLogonDate', 'Created', 'Creator', 'Location', 'ManagedByDisplayName', 'OU')
 
-            $QuotaUsers = Foreach ($G in (Get-ADGroup -Filter "Name -like '$QuotaGroupNameBegin*'")) {
+            $QuotaUsers = foreach ($G in (Get-ADGroup -Filter "Name -like '$QuotaGroupNameBegin*'")) {
                 Write-Verbose "Quota group '$($G.SamAccountName)'"
                 # avoid pipeline with AD CmdLets for Pester tests, known limitation in Pester 4.0.8
                 $Members = Get-ADGroupMember $G.SamAccountName -Recursive
@@ -1081,7 +1081,7 @@ Process {
         #endregion
 
         #region GIT users
-        $M = "Get all GIT users with issues"
+        $M = 'Get all GIT users with issues'
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
 
@@ -1093,7 +1093,7 @@ Process {
                 Select-Object *,
                 @{N = 'OU'; E = { ConvertTo-OuNameHC $_.CanonicalName } },
                 @{
-                    N = 'ManagerDisplayName';
+                    N = 'ManagerDisplayName'
                     E = { if ($_.manager) { Get-ADDisplayNameHC $_.manager } }
                 }
             )
@@ -1106,8 +1106,8 @@ Process {
                 'WhenCreated', 'Country', 'Enabled', 'OU'
                 Type             = 'GitUser'
                 Data             = $GitUsers.where( {
-                        (($_.LastLogonDate -LE $CompareDate) -or ($_.LastLogonDate -EQ $null)) -and
-                        ($_.WhenCreated -LE $CompareDate) -and
+                        (($_.LastLogonDate -le $CompareDate) -or ($_.LastLogonDate -eq $null)) -and
+                        ($_.WhenCreated -le $CompareDate) -and
                         ($_.Enabled) })
             }
 
@@ -1120,7 +1120,7 @@ Process {
                 Type             = 'GitUser'
                 Data             = $GitUsers.where(
                     {
-                    ($_.Enabled) -and (-not $_.manager)
+                        ($_.Enabled) -and (-not $_.manager)
                     }
                 )
             }
@@ -1136,17 +1136,17 @@ Process {
 
                     $G | Add-Member -NotePropertyName ManagerName -NotePropertyValue $null
 
-                    Try {
+                    try {
                         $Manager = Get-ADUser $G.Manager
 
                         $G.ManagerName = $Manager.Name
 
-                        if (($G.Name -Replace '...$') -eq ($Manager.Name -Replace '...$')) {
+                        if (($G.Name -replace '...$') -eq ($Manager.Name -replace '...$')) {
                             $ManagerWrong = $false
                         }
                     }
-                    Catch {
-                        Write-Verbose "Manager is not a user or is not found"
+                    catch {
+                        Write-Verbose 'Manager is not a user or is not found'
                     }
 
                     if ($ManagerWrong) {
@@ -1157,16 +1157,16 @@ Process {
         }
         #endregion
     }
-    Catch {
+    catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
         Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"
-        Write-EventLog @EventEndParams; Exit 1
+        Write-EventLog @EventEndParams; exit 1
     }
 }
 
-End {
-    Try {
+end {
+    try {
         $MailParams = @{
             Attachments = @()
         }
@@ -1224,7 +1224,7 @@ End {
         #region Test for incorrect ticket topic
         $File.Tickets | Get-Member -MemberType NoteProperty -EA Ignore |
         Where-Object {
-            $AllObjects.GetEnumerator().Name -notContains $_.Name
+            $AllObjects.GetEnumerator().Name -notcontains $_.Name
         } | ForEach-Object {
             throw "The parameter 'Tickets' in the file '$ImportFile' contains an invalid topic name '$($_.Name)', valid topic names are: '$(($AllObjects.GetEnumerator().Name | Sort-Object) -join "', '")'"
         }
@@ -1302,7 +1302,7 @@ End {
                     $GroupMembersHtmlList += $HtmlListItem
                     break
                 }
-                Default {
+                default {
                     throw "The custom object type '$_' is not supported. Please implement this feature."
                 }
             }
@@ -1456,13 +1456,13 @@ $(if($ExcludedGroups) {
         }
         #endregion
     }
-    Catch {
+    catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
-        Write-EventLog @EventErrorParams -Message  "FAILURE:`n`n- $_"
-        Exit 1;
+        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"
+        exit 1
     }
-    Finally {
+    finally {
         Write-EventLog @EventEndParams
     }
 }

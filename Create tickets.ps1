@@ -52,7 +52,7 @@
         any tickets created yet for them with the issue 'Computer - Inactive'.
 #>
 [CmdLetBinding()]
-Param (
+param (
     [Parameter(Mandatory)]
     [String]$ScriptName,
     [Parameter(Mandatory)]
@@ -74,8 +74,8 @@ Param (
     [String[]]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
 
-Begin {
-    Try {
+begin {
+    try {
         $M = "TopicName '$TopicName' TopicDescription '$TopicDescription'"
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
@@ -142,24 +142,24 @@ Begin {
         Write-EventLog @EventVerboseParams -Message $M
         #endregion
     }
-    Catch {
+    catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
-        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; Exit 1
+        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; exit 1
     }
 }
 
-Process {
-    Try {
+process {
+    try {
         $PSCode = $null
         $ticketDescription = $KeyValuePair.Description
-        Foreach (
+        foreach (
             $D in
             $Data | Where-Object {
-                $openTickets.SamAccountName -notContains $_.SamAccountName
+                $openTickets.SamAccountName -notcontains $_.SamAccountName
             }
         ) {
-            Try {
+            try {
                 #region Create ticket
                 $PSCode = New-PSCodeHC $SQLTicketDefaults.ServiceCountryCode
 
@@ -206,7 +206,7 @@ Process {
                     $(FSQL $TopicName), $(FSQL $TicketRequestedDate), '$TicketNr')"
                 #endregion
             }
-            Catch {
+            catch {
                 throw "Failed creating a ticket for TopicName '$TopicName' SamAccountName '$($D.SamAccountName)': $_"
             }
         }
@@ -217,9 +217,9 @@ Process {
             Write-EventLog @EventVerboseParams -Message $M
         }
     }
-    Catch {
+    catch {
         Write-Warning $_
         Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
-        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; Exit 1
+        Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; exit 1
     }
 }

@@ -32,7 +32,7 @@ BeforeAll {
     }
 }
 Describe 'the mandatory parameters are' {
-    It "<_>" -ForEach @(
+    It '<_>' -ForEach @(
         'ScriptName', 'Environment', 'TopicName', 'TopicDescription', 'Data'
     ) {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory |
@@ -49,7 +49,7 @@ Describe 'an error is thrown when' {
 
         Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
             ($EntryType -eq 'Error') -and
-            ($Message -like "*No ticket default values found*")
+            ($Message -like '*No ticket default values found*')
         }
     }
     It 'the .json file contains unknown ticket fields' {
