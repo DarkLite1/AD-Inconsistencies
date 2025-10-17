@@ -1,5 +1,5 @@
 #Requires -Modules Pester
-#Requires -Version 5.1
+#Requires -Version 7
 
 BeforeAll {
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
