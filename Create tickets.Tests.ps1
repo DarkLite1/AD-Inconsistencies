@@ -90,12 +90,6 @@ Describe 'create no ticket' {
     It 'when a ticket was already created and it is still open' {
         Should -Not -Invoke New-CherwellTicketHC -Scope Describe
     }
-    It 'and register this in the event log' {
-        Should -Invoke Write-EventLog -Times 1 -Exactly -Scope Describe -ParameterFilter {
-            ($EntryType -ne 'Error') -and
-            ($Message -like 'No ticket created')
-        }
-    }
 }
 Describe 'create a new ticket' {
     BeforeAll {

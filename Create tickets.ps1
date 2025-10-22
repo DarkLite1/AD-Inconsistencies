@@ -151,8 +151,8 @@ begin {
 
 process {
     try {
-        $PSCode = $null
         $ticketDescription = $KeyValuePair.Description
+        
         foreach (
             $D in
             $Data | Where-Object {
@@ -209,12 +209,6 @@ process {
             catch {
                 throw "Failed creating a ticket for TopicName '$TopicName' SamAccountName '$($D.SamAccountName)': $_"
             }
-        }
-
-        if (-not $PSCode) {
-            $M = 'No ticket created'
-            Write-Verbose $M
-            Write-EventLog @EventVerboseParams -Message $M
         }
     }
     catch {
