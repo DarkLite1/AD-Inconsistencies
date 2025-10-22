@@ -14,7 +14,10 @@
     .EXAMPLE
         $params = @{
             ScriptName        = 'AD Inconsistencies (BNL)'
-            Environment       = 'Stage'
+            PSCustomObject    = @{
+                CredentialsFilePath = 'C:\PasswordsServiceNow.json'
+                Environment         = 'Test'
+            }
             SQLDatabase       = 'Powershell TEST'
             TopicName         = 'Computer - Inactive'
             TopicDescription  = 'LastLogonDate over 40 days'
@@ -56,7 +59,7 @@ param (
     [Parameter(Mandatory)]
     [String]$ScriptName,
     [Parameter(Mandatory)]
-    [String]$Environment,
+    [PSCustomObject]$ServiceNow,
     [Parameter(Mandatory)]
     [String]$TopicName,
     [Parameter(Mandatory)]
