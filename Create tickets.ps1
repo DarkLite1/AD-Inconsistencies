@@ -78,10 +78,96 @@ param (
 )
 
 begin {
+    function New-ServiceNowSessionHC {
+        param (
+            [parameter(Mandatory)]
+            [String]$Uri,
+            [parameter(Mandatory)]
+            [String]$UserName,
+            [parameter(Mandatory)]
+            [String]$Password,
+            [parameter(Mandatory)]
+            [String]$ClientId,
+            [parameter(Mandatory)]
+            [String]$ClientSecret   
+        )
+        try {
+            $userCred = New-Object System.Management.Automation.PSCredential(
+                $UserName, 
+                ($Password | ConvertTo-SecureString -AsPlainText -Force)
+            )
+        
+            $clientCred = New-Object System.Management.Automation.PSCredential(
+                $ClientId, 
+                ($ClientSecret | ConvertTo-SecureString -AsPlainText -Force)
+            )
+            
+            $params = @{
+                Url              = $Uri
+                Credential       = $userCred
+                ClientCredential = $clientCred
+            }
+            New-ServiceNowSession @params
+        }
+        catch {
+            $errorMessage = $_; $Error.RemoveAt(0)
+            throw "Failed to create a ServiceNow session: $errorMessage"
+        }           
+    }
+
     try {
         $M = "TopicName '$TopicName' TopicDescription '$TopicDescription'"
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
+
+        #region Create ServiceNow session
+        if (-not $ServiceNowSession) {
+            #region Test ServiceNow parameters
+            @(
+                'CredentialsFilePath', 'Environment'
+            ).where(
+                { -not $ServiceNow.$_ }
+            ).foreach(
+                { throw "Property 'ServiceNow.$_' not found" }
+            )
+
+            try {
+                $serviceNowJsonFileContent = Get-Content $ImportFile -Raw -EA Stop | ConvertFrom-Json
+            }
+            catch {
+                throw "Failed to import the ServiceNow environment file '$($ServiceNow.CredentialsFilePath)': $_"
+            }
+
+            try {
+                $serviceNowEnvironment = $serviceNowJsonFileContent[$ServiceNow.Environment]
+            }
+            catch {
+                throw "Failed to find environment '$($ServiceNow.Environment)' in the ServiceNow environment file '$($ServiceNow.CredentialsFilePath)'"
+            }
+
+            @(
+                'Uri', 'UserName', 'Password', 'ClientId', 'ClientSecret'
+            ).where(
+                { -not $serviceNowEnvironment.$_ }
+            ).foreach(
+                { 
+                    throw "Property '$_' not found for environment '$($ServiceNow.Environment)' in file '$($ServiceNow.CredentialsFilePath)'"
+                }
+            )
+            #endregion
+
+            #region Create global variable $ServiceNowSession
+            $params = @{
+                Uri          = $serviceNowEnvironment.Uri
+                UserName     = $serviceNowEnvironment.UserName
+                Password     = $serviceNowEnvironment.Password
+                ClientId     = $serviceNowEnvironment.ClientId
+                ClientSecret = $serviceNowEnvironment.ClientSecret
+            }
+            New-ServiceNowSessionHC @params
+            #endregion
+        }
+        #endregion
 
         $SQLParams = @{
             ServerInstance         = $SQLServerInstance
