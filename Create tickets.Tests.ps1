@@ -62,7 +62,7 @@ Describe 'an error is thrown when' {
 
         Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
             ($EntryType -eq 'Error') -and
-            ($Message -like "*Field name 'incorrectFieldName' not found*")
+            ($Message -like "*Field name 'incorrectFieldName' not valid*")
         }
 
         Should -Not -Invoke New-CherwellTicketHC

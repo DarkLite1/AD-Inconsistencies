@@ -1,6 +1,6 @@
 #Requires -Version 7
-#Requires -Modules Toolbox.HTML, Toolbox.EventLog, Toolbox.Cherwell
-#Requires -Modules SqlServer
+#Requires -Modules Toolbox.HTML, Toolbox.EventLog
+#Requires -Modules SqlServer, ServiceNow
 
 <#
     .SYNOPSIS
@@ -122,7 +122,7 @@ begin {
             $TicketFields.PSObject.Properties | Where-Object { $_.Value }
         ) {
             if (-not $KeyValuePair.containsKey($field.Name)) {
-                throw "Field name '$($field.Name)' not found in Cherwell, valid fields are '$($KeyValuePair.Keys)'"
+                throw "Field name '$($field.Name)' not valid, valid fields are '$($KeyValuePair.Keys)'"
             }
             $KeyValuePair[$field.Name] = $field.Value
         }
@@ -152,7 +152,7 @@ begin {
 process {
     try {
         $ticketDescription = $KeyValuePair.Description
-        
+
         foreach (
             $D in
             $Data | Where-Object {
