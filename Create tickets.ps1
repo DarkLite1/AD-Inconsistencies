@@ -233,7 +233,7 @@ begin {
     }
     catch {
         Write-Warning $_
-        Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
+        Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message "FAiled creating tickets: $_" -Header $ScriptName
         Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; exit 1
     }
 }
@@ -302,7 +302,7 @@ process {
     }
     catch {
         Write-Warning $_
-        Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message $_ -Header $ScriptName
+        Send-MailHC -To $ScriptAdmin -Subject FAILURE -Priority High -Message "FAiled creating tickets: $_" -Header $ScriptName
         Write-EventLog @EventErrorParams -Message "FAILURE:`n`n- $_"; exit 1
     }
 }
