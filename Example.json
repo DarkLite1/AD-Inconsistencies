@@ -30,6 +30,10 @@
     "OU": "OU=GIT,DC=contoso,DC=com",
     "CountryCode": ["BE", "LU", "NL"]
   },
+  "ServiceNow": {
+    "CredentialsFilePath": "C:\\PasswordsServiceNow.json",
+    "Environment": "Prod"
+  },
   "Tickets": {
     "Computer - EnabledInDisabledOU": {
       "ShortDescription": "AD Inconsistency: Computer enabled in disabled OU",
