@@ -5,7 +5,10 @@ BeforeAll {
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
     $TestParams = @{
         ScriptName       = 'Test'
-        Environment      = 'Stage'
+        ServiceNow       = @{
+            CredentialsFilePath = (New-Item -Path 'TestDrive:\a.json' -ItemType File).FullName
+            Environment         = 'Test'
+        }
         SQLDatabase      = 'Test'
         TopicName        = 'Computer - Inactive'
         TopicDescription = "'LastLogonDate' over x days"
