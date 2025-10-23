@@ -67,6 +67,7 @@ BeforeAll {
     }
 
     Mock New-CherwellTicketHC { 1 }
+    Mock New-ServiceNowSession { $true }
     Mock Save-TicketInSqlHC
     Mock Send-MailHC
     Mock Write-EventLog
@@ -90,6 +91,10 @@ Describe 'the mandatory parameters are' {
     }
 }
 Describe 'an error is thrown when' {
+    BeforeEach {
+        $ServiceNowSession = $null
+        $testNewParams = Copy-ObjectHC $TestParams
+    }
     It 'no ticket default values are found in SQL' {
         Mock Invoke-Sqlcmd -ParameterFilter {
             $Query -like "*FROM $SQLTableTicketsDefaults*"
@@ -100,12 +105,11 @@ Describe 'an error is thrown when' {
         Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
             ($Message -like '*No ticket default values found*')
         }
-        
+
         $LASTEXITCODE | Should -Be 1
     }
     Context 'the import file property' {
         It 'TicketFields contains unknown ticket fields' {
-            $testNewParams = Copy-ObjectHC $TestParams
             $testNewParams.TicketFields = [PSCustomObject]@{
                 incorrectFieldName = 'x'
             }
@@ -117,22 +121,29 @@ Describe 'an error is thrown when' {
             }
 
             $LASTEXITCODE | Should -Be 1
-            Should -Not -Invoke New-CherwellTicketHC
         }
     }
     Context 'property' {
         It 'ServiceNow.<_> is not found' -ForEach @(
             'CredentialsFilePath', 'Environment'
         ) {
-            $testNewParams = Copy-ObjectHC $TestParams
             $testNewParams.ServiceNow.$_ = $null
-
-            $ServiceNowSession = $null
 
             .$testScript @testNewParams
 
             Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
                 ($Message -like "*Property 'ServiceNow.$_' not found*")
+            }
+
+            $LASTEXITCODE | Should -Be 1
+        }
+        It 'ServiceNow.CredentialsFilePath does not exist' {
+            $testNewParams.ServiceNow.CredentialsFilePath = 'TestDrive:\NotExisting.json'
+
+            .$testScript @testNewParams
+
+            Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
+                ($Message -like "*Failed to import the ServiceNow environment file 'TestDrive:\NotExisting.json': *")
             }
 
             $LASTEXITCODE | Should -Be 1

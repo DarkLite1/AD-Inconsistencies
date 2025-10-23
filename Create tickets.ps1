@@ -132,16 +132,15 @@ begin {
             )
 
             try {
-                $serviceNowJsonFileContent = Get-Content $ImportFile -Raw -EA Stop | ConvertFrom-Json
+                $serviceNowJsonFileContent = Get-Content $ServiceNow.CredentialsFilePath -Raw -EA Stop | ConvertFrom-Json
             }
             catch {
                 throw "Failed to import the ServiceNow environment file '$($ServiceNow.CredentialsFilePath)': $_"
             }
 
-            try {
-                $serviceNowEnvironment = $serviceNowJsonFileContent[$ServiceNow.Environment]
-            }
-            catch {
+            $serviceNowEnvironment = $serviceNowJsonFileContent.($ServiceNow.Environment)
+
+            if (-not $serviceNowEnvironment) {
                 throw "Failed to find environment '$($ServiceNow.Environment)' in the ServiceNow environment file '$($ServiceNow.CredentialsFilePath)'"
             }
 
