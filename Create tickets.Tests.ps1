@@ -98,13 +98,14 @@ Describe 'an error is thrown when' {
         .$testScript @TestParams
 
         Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
-            ($EntryType -eq 'Error') -and
             ($Message -like '*No ticket default values found*')
         }
+        
+        $LASTEXITCODE | Should -Be 1
     }
     Context 'the import file property' {
         It 'TicketFields contains unknown ticket fields' {
-            $testNewParams = $testParams.Clone()
+            $testNewParams = Copy-ObjectHC $TestParams
             $testNewParams.TicketFields = [PSCustomObject]@{
                 incorrectFieldName = 'x'
             }
@@ -112,10 +113,10 @@ Describe 'an error is thrown when' {
             .$testScript @testNewParams
 
             Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
-                ($EntryType -eq 'Error') -and
                 ($Message -like "*Field name 'incorrectFieldName' not valid*")
             }
 
+            $LASTEXITCODE | Should -Be 1
             Should -Not -Invoke New-CherwellTicketHC
         }
     }
@@ -135,9 +136,9 @@ Describe 'an error is thrown when' {
             }
 
             $LASTEXITCODE | Should -Be 1
-        } -Tag test
+        }
     }
-}
+} -Tag test
 Describe 'create no ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {
