@@ -134,7 +134,7 @@ Describe 'an error is thrown when' {
                 ($Message -like "*Property 'ServiceNow.$_' not found*")
             }
 
-            # $LASTEXITCODE | Should -Be 1
+            $LASTEXITCODE | Should -Be 1
         } -Tag test
     }
 }
