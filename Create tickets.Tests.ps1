@@ -5,7 +5,7 @@ BeforeAll {
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
     $TestParams = @{
         ScriptName       = 'Test'
-        ServiceNow       = @{
+        ServiceNow       = [PSCustomObject]@{
             CredentialsFilePath = (New-Item -Path 'TestDrive:\a.json' -ItemType File).FullName
             Environment         = 'Test'
         }
@@ -17,6 +17,53 @@ BeforeAll {
                 SamAccountName = 'PC1'
             }
         )
+    }
+
+    @{
+        Test = @{
+            Uri          = 'testUri'
+            UserName     = 'testUserName'
+            Password     = 'testPassword'
+            ClientId     = 'testClientId'
+            ClientSecret = 'testClientSecret'
+        }
+        Prod = @{
+            Uri          = 'prodUri'
+            UserName     = 'prodUserName'
+            Password     = 'prodPassword'
+            ClientId     = 'prodClientId'
+            ClientSecret = 'prodClientSecret'
+        }
+    } | ConvertTo-Json | 
+    Out-File -FilePath $TestParams.ServiceNow.CredentialsFilePath
+
+    function Copy-ObjectHC {
+        <#
+        .SYNOPSIS
+            Make a deep copy of an object using JSON serialization.
+
+        .DESCRIPTION
+            Uses ConvertTo-Json and ConvertFrom-Json to create an independent
+            copy of an object. This method is generally effective for objects
+            that can be represented in JSON format.
+
+        .PARAMETER InputObject
+            The object to copy.
+
+        .EXAMPLE
+            $newArray = Copy-ObjectHC -InputObject $originalArray
+        #>
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory)]
+            [Object]$InputObject
+        )
+
+        $jsonString = $InputObject | ConvertTo-Json -Depth 100
+
+        $deepCopy = $jsonString | ConvertFrom-Json -AsHashtable
+
+        return $deepCopy
     }
 
     Mock New-CherwellTicketHC { 1 }
@@ -55,20 +102,40 @@ Describe 'an error is thrown when' {
             ($Message -like '*No ticket default values found*')
         }
     }
-    It 'the .json file contains unknown ticket fields' {
-        $testNewParams = $testParams.Clone()
-        $testNewParams.TicketFields = [PSCustomObject]@{
-            incorrectFieldName = 'x'
+    Context 'the import file property' {
+        It 'TicketFields contains unknown ticket fields' {
+            $testNewParams = $testParams.Clone()
+            $testNewParams.TicketFields = [PSCustomObject]@{
+                incorrectFieldName = 'x'
+            }
+
+            .$testScript @testNewParams
+
+            Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
+                ($EntryType -eq 'Error') -and
+                ($Message -like "*Field name 'incorrectFieldName' not valid*")
+            }
+
+            Should -Not -Invoke New-CherwellTicketHC
         }
+    }
+    Context 'property' {
+        It 'ServiceNow.<_> is not found' -ForEach @(
+            'CredentialsFilePath', 'Environment'
+        ) {
+            $testNewParams = Copy-ObjectHC $TestParams
+            $testNewParams.ServiceNow.$_ = $null
 
-        .$testScript @testNewParams
+            $ServiceNowSession = $null
 
-        Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
-            ($EntryType -eq 'Error') -and
-            ($Message -like "*Field name 'incorrectFieldName' not valid*")
-        }
+            .$testScript @testNewParams
 
-        Should -Not -Invoke New-CherwellTicketHC
+            Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
+                ($Message -like "*Property 'ServiceNow.$_' not found*")
+            }
+
+            # $LASTEXITCODE | Should -Be 1
+        } -Tag test
     }
 }
 Describe 'create no ticket' {
