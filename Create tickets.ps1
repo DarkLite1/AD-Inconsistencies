@@ -124,7 +124,7 @@ begin {
         if (-not $ServiceNowSession) {
             #region Test ServiceNow parameters
             @(
-                'CredentialsFilePath', 'Environment'
+                'CredentialsFilePath', 'Environment', 'TicketFields'
             ).where(
                 { -not $ServiceNow.$_ }
             ).foreach(

@@ -8,6 +8,7 @@ BeforeAll {
         ServiceNow       = [PSCustomObject]@{
             CredentialsFilePath = (New-Item -Path 'TestDrive:\a.json' -ItemType File).FullName
             Environment         = 'Test'
+            TicketFields        = @{}
         }
         SQLDatabase      = 'Test'
         TopicName        = 'Computer - Inactive'
@@ -125,7 +126,7 @@ Describe 'an error is thrown when' {
     }
     Context 'property' {
         It 'ServiceNow.<_> is not found' -ForEach @(
-            'CredentialsFilePath', 'Environment'
+            'CredentialsFilePath', 'Environment', 'TicketFields'
         ) {
             $testNewParams.ServiceNow.$_ = $null
 
