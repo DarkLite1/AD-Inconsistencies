@@ -32,7 +32,21 @@
   },
   "ServiceNow": {
     "CredentialsFilePath": "C:\\PasswordsServiceNow.json",
-    "Environment": "Prod"
+    "Environment": "Prod",
+    "TicketFields": {
+      "Caller": "029d4ec3eb1e22105d05fa2bcad0cd3b",
+      "ShortDescription": "AD inconsistency",
+      "Description": null,
+      "AssignmentGroup": "23659b14eb2aa61004fff24e0bd0cdf8",
+      "Category": null,
+      "Subcategory": null,
+      "InputData": {
+        "service_offering": "ed1ce80eeb74a6105d05fa2bcad0cdbf",
+        "cmdb_ci": null,
+        "impact": 2,
+        "priority": 2
+      }
+    }
   },
   "Tickets": {
     "Computer - EnabledInDisabledOU": {

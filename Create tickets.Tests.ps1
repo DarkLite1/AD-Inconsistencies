@@ -149,7 +149,7 @@ Describe 'an error is thrown when' {
             $LASTEXITCODE | Should -Be 1
         }
     }
-} -Tag test
+}
 Describe 'create no ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {
@@ -172,7 +172,7 @@ Describe 'create no ticket' {
     It 'when a ticket was already created and it is still open' {
         Should -Not -Invoke New-CherwellTicketHC -Scope Describe
     }
-}
+} -Tag test
 Describe 'create a new ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {
