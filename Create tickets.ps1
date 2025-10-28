@@ -68,12 +68,6 @@ param (
     [PSCustomObject[]]$Data,
     [PSCustomObject]$TicketFields,
     [DateTime]$TicketRequestedDate = (Get-Date),
-
-    [String]$SQLServerInstance = 'GRPSDFRAN0049',
-    [String]$SQLDatabase = 'PowerShell',
-    [String]$SQLTableTicketsDefaults = 'TicketsDefaults',
-    [String]$SQLTableAdInconsistencies = 'AdInconsistencies',
-
     [String[]]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
 
@@ -167,15 +161,6 @@ begin {
             #endregion
         }
         #endregion
-
-        $SQLParams = @{
-            ServerInstance         = $SQLServerInstance
-            Database               = $SQLDatabase
-            TrustServerCertificate = $true
-            QueryTimeout           = '1000'
-            ConnectionTimeout      = '20'
-            ErrorAction            = 'Stop'
-        }
 
         #region Get SQL ticket default values
         $SQLTicketDefaults = Invoke-Sqlcmd @SQLParams -Query "

@@ -173,7 +173,7 @@ Describe 'create no ticket' {
     It 'when a ticket was already created and it is still open' {
         Should -Not -Invoke New-CherwellTicketHC -Scope Describe
     }
-} -Tag test
+}
 Describe 'create a new ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {
@@ -232,4 +232,4 @@ Describe 'create a new ticket' {
             }
         }
     }
-}
+} -Tag test
