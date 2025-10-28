@@ -157,31 +157,43 @@ begin {
         }
         #endregion
 
-        #region Overwrite with json file default values
-        $KeyValuePair = @{
-            ServiceCountryCode        = $SQLTicketDefaults.ServiceCountryCode
-            RequesterSamAccountName   = $SQLTicketDefaults.Requester
-            SubmittedBySamAccountName = $SQLTicketDefaults.SubmittedBy
-            OwnedByTeam               = $SQLTicketDefaults.OwnedByTeam
-            OwnedBySamAccountName     = $SQLTicketDefaults.OwnedBy
-            ShortDescription          = $SQLTicketDefaults.ShortDescription
-            Description               = 'Please correct the following:'
-            Service                   = $SQLTicketDefaults.Service
-            Category                  = $SQLTicketDefaults.Category
-            SubCategory               = $SQLTicketDefaults.SubCategory
-            Source                    = $SQLTicketDefaults.Source
-            IncidentType              = $SQLTicketDefaults.IncidentType
-            Priority                  = $SQLTicketDefaults.Priority
-        }
+        #region Create ServiceNow ticket fields
+        $newTicketParams = @{}
 
         foreach (
-            $field in
-            $TicketFields.PSObject.Properties | Where-Object { $_.Value }
+            $field in 
+            @(
+                $ServiceNow.TicketFields.PSObject.Properties + 
+                $TicketFields.PSObject.Properties
+            ) | Where-Object { $_.Value }
         ) {
-            if (-not $KeyValuePair.containsKey($field.Name)) {
-                throw "Field name '$($field.Name)' not valid, valid fields are '$($KeyValuePair.Keys)'"
+            if (
+                ($field.Value -is [String]) -or
+                ($field.Value -is [Int])
+            ) {
+                $newTicketParams[$field.Name] = $field.Value
             }
-            $KeyValuePair[$field.Name] = $field.Value
+            else {
+                #region Update nested properties
+                $propertyName = $field.Name
+                $propertyValues = @{}
+    
+                $field.Value.PSObject.Properties.foreach(
+                    { $propertyValues[$_.Name] = $_.Value }
+                )
+    
+                if ($newTicketParams.ContainsKey($propertyName)) {
+                    $existingHashtable = $newTicketParams[$propertyName]
+                    
+                    foreach ($key in $propertyValues.Keys) {
+                        $existingHashtable[$key] = $propertyValues[$key]
+                    }
+                }
+                else {
+                    $newTicketParams[$propertyName] = $propertyValues
+                }
+                #endregion
+            }
         }
         #endregion
     }
@@ -194,8 +206,6 @@ begin {
 
 process {
     try {
-        $ticketDescription = $KeyValuePair.Description
-
         foreach (
             $D in
             $Data | Where-Object {
@@ -204,10 +214,7 @@ process {
         ) {
             try {
                 #region Create ticket
-                $PSCode = New-PSCodeHC $SQLTicketDefaults.ServiceCountryCode
-
-                $KeyValuePair.Description = $ticketDescription + "
-                <br><br>
+                $KeyValuePair.Description = "
                 $TopicDescription
                 <br><br>
                 <table style=`"border:none`">
