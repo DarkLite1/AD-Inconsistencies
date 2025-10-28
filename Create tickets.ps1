@@ -1,6 +1,6 @@
 #Requires -Version 7
 #Requires -Modules Toolbox.HTML, Toolbox.EventLog
-#Requires -Modules SqlServer, ServiceNow
+#Requires -Modules ServiceNow
 
 <#
     .SYNOPSIS
