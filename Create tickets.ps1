@@ -213,6 +213,12 @@ process {
             }
         ) {
             try {
+                #region Create unique ID
+                $uniqueId = 'PSID_{0}_{1}' -f 
+                $($TopicName.Replace(' ', '')), 
+                $($D.SamAccountName.Replace(' ','-'))
+                #endregion
+
                 #region Create ticket
                 $KeyValuePair.Description = "
                 $TopicDescription
@@ -225,16 +231,11 @@ process {
                     </tr>' -f $_.Name, $_.Value
                 })
                 </table>"
-                Remove-EmptyParamsHC -Name $KeyValuePair
+                
 
-                $TicketParams = @{
-                    Environment  = $Environment
-                    KeyValuePair = $KeyValuePair
-                    ErrorAction  = 'Stop'
-                }
-                $TicketNr = New-CherwellTicketHC @TicketParams
+                $ticket = New-ServiceNowIncident @params -PassThru
 
-                Write-EventLog @EventOutParams -Message "Created ticket '$TicketNr' for '$($D.SamAccountName)' with short description '$($KeyValuePair.ShortDescription)'"
+                Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with short description '$($KeyValuePair.ShortDescription)'"
                 #endregion
             }
             catch {
