@@ -157,7 +157,7 @@ begin {
         }
         #endregion
 
-        #region Create ServiceNow ticket fields
+        #region Create new ticket params
         $newTicketParams = @{}
 
         foreach (
