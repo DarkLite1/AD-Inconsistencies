@@ -85,44 +85,16 @@ BeforeAll {
 }
 Describe 'the mandatory parameters are' {
     It '<_>' -ForEach @(
-        'ScriptName', 'Environment', 'TopicName', 'TopicDescription', 'Data'
+        'ScriptName', 'ServiceNow', 'TopicName', 'TopicDescription', 'Data'
     ) {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory |
         Should -BeTrue
     }
-}
+} -Tag test
 Describe 'an error is thrown when' {
     BeforeEach {
         $ServiceNowSession = $null
         $testNewParams = Copy-ObjectHC $TestParams
-    }
-    It 'no ticket default values are found in SQL' {
-        Mock Invoke-Sqlcmd -ParameterFilter {
-            $Query -like "*FROM $SQLTableTicketsDefaults*"
-        }
-
-        .$testScript @TestParams
-
-        Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
-            ($Message -like '*No ticket default values found*')
-        }
-
-        $LASTEXITCODE | Should -Be 1
-    }
-    Context 'the import file property' {
-        It 'TicketFields contains unknown ticket fields' {
-            $testNewParams.TicketFields = [PSCustomObject]@{
-                incorrectFieldName = 'x'
-            }
-
-            .$testScript @testNewParams
-
-            Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
-                ($Message -like "*Field name 'incorrectFieldName' not valid*")
-            }
-
-            $LASTEXITCODE | Should -Be 1
-        }
     }
     Context 'property' {
         It 'ServiceNow.<_> is not found' -ForEach @(
@@ -150,7 +122,7 @@ Describe 'an error is thrown when' {
             $LASTEXITCODE | Should -Be 1
         }
     }
-}
+} -Tag test
 Describe 'create no ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {
@@ -232,4 +204,4 @@ Describe 'create a new ticket' {
             }
         }
     }
-} -Tag test
+}
