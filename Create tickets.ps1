@@ -104,7 +104,7 @@ begin {
         }
         catch {
             $errorMessage = $_; $Error.RemoveAt(0)
-            throw "Failed to create a ServiceNow session: $errorMessage"
+            throw "Failed to create a ServiceNow session with Uri '$Uri' UserName '$UserName' ClientId '$ClientId': $errorMessage"
         }           
     }
 
@@ -158,17 +158,6 @@ begin {
             }
             New-ServiceNowSessionHC @params
             #endregion
-        }
-        #endregion
-
-        #region Get SQL ticket default values
-        $SQLTicketDefaults = Invoke-Sqlcmd @SQLParams -Query "
-            SELECT *
-            FROM $SQLTableTicketsDefaults
-            WHERE ScriptName = '$ScriptName'"
-
-        if (-not $SQLTicketDefaults) {
-            throw "No ticket default values found in SQL table '$SQLTableTicketsDefaults' for ScriptName '$ScriptName'"
         }
         #endregion
 
