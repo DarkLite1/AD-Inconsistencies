@@ -118,7 +118,7 @@ begin {
             [PSCustomObject]$TicketFields
         )
 
-        & $Script -ScriptName $ScriptName -ServiceNow $file.ServiceNow -TopicName $TopicName -TopicDescription $TopicDescription -Data $Data -TicketFields $TicketFields -TicketRequestedDate $Now -ScriptAdmin $ScriptAdmin
+        & $Script -ScriptName $ScriptName -ServiceNow $file.ServiceNow -TopicName $TopicName -TopicDescription $TopicDescription -Data $Data -TicketFields $TicketFields -ScriptAdmin $ScriptAdmin
     }
 
     try {

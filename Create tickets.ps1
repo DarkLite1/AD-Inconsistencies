@@ -67,7 +67,6 @@ param (
     [Parameter(Mandatory)]
     [PSCustomObject[]]$Data,
     [PSCustomObject]$TicketFields,
-    [DateTime]$TicketRequestedDate = (Get-Date),
     [String[]]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
 )
 
@@ -200,20 +199,6 @@ begin {
             $KeyValuePair[$field.Name] = $field.Value
         }
         #endregion
-
-        #region Get open tickets
-        $openTickets = Invoke-Sqlcmd @SQLParams -Query "
-            SELECT SamAccountName
-            FROM $SQLTableAdInconsistencies
-            WHERE
-                TopicName = '$TopicName' AND
-                TicketRequestedDate IS NOT NULL AND
-                TicketCloseDate IS NULL"
-
-        $M = "Found $($openTickets.count) open tickets"
-        Write-Verbose $M
-        Write-EventLog @EventVerboseParams -Message $M
-        #endregion
     }
     catch {
         Write-Warning $_
@@ -258,25 +243,6 @@ process {
                 $TicketNr = New-CherwellTicketHC @TicketParams
 
                 Write-EventLog @EventOutParams -Message "Created ticket '$TicketNr' for '$($D.SamAccountName)' with short description '$($KeyValuePair.ShortDescription)'"
-                #endregion
-
-                #region Save details in SQL
-                $SaveTicketParams = @{
-                    Database     = $SQLDatabase
-                    ScriptName   = $ScriptName
-                    KeyValuePair = $KeyValuePair
-                    PSCode       = $PSCode
-                    TicketNr     = $TicketNr
-                }
-                Save-TicketInSqlHC @SaveTicketParams
-
-                Invoke-Sqlcmd @SQLParams -Query "
-                    INSERT INTO $SQLTableAdInconsistencies
-                    (PSCode, SamAccountName, TopicName,
-                    TicketRequestedDate, TicketNr)
-                    VALUES(
-                    '$PSCode', $(FSQL $D.SamAccountName),
-                    $(FSQL $TopicName), $(FSQL $TicketRequestedDate), '$TicketNr')"
                 #endregion
             }
             catch {
