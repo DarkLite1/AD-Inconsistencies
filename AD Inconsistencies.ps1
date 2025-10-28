@@ -154,6 +154,10 @@ begin {
 
             $GitSearchCountries = ($GitCountryCode | ForEach-Object { "(Country -EQ '$_')" }) -join ' -or '
         }
+
+        if (-not $ScriptAdmin) {
+            throw "property 'ScriptAdmin' not found"
+        }
         #endregion
 
         #region Get tickets file
@@ -1297,9 +1301,9 @@ end {
                 if ($createTicket) {
                     $params = @{
                         ScriptName       = $ScriptName 
+                        ScriptAdmin      = $ScriptAdmin
                         ServiceNow       = $file.ServiceNow 
                         TopicName        = $A.Name
-                        TopicDescription = $A.Value.Description
                         TicketFields     = $File.Tickets."$($A.Name)" |
                         Select-Object -ExcludeProperty 'Exclude' 
                         Data             = $A.Value.Data | Select-Object (
@@ -1309,7 +1313,6 @@ end {
                                 Where-Object { $_ -ne 'SamAccountName' }
                             )
                         )
-                        ScriptAdmin      = $ScriptAdmin
                     }
                     & $scriptCreateTicketsItem.FullName @params
                 }

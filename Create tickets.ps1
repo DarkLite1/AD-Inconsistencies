@@ -14,13 +14,18 @@
     .EXAMPLE
         $params = @{
             ScriptName        = 'AD Inconsistencies (BNL)'
-            PSCustomObject    = @{
+            ScriptAdmin       = @('bob@gmail.com')
+            ServiceNow        = @{
                 CredentialsFilePath = 'C:\PasswordsServiceNow.json'
-                Environment         = 'Test'
+                Environment         = 'Prod'
+                TicketFields        = @{
+                    Caller           = 'xxx'
+                    ShortDescription = 'xxx'
+                    Category         = 'xxx'
+                    SubCategory      = 'xxx'
+                }
             }
-            SQLDatabase       = 'Powershell TEST'
             TopicName         = 'Computer - Inactive'
-            TopicDescription  = 'LastLogonDate over 40 days'
             Data = @(
                 [PSCustomObject]@{
                     Name                  = 'Bob Lee Swagger'
@@ -30,15 +35,6 @@
                     EmployeeType          = 'Sniper'
                     ManagerDisplayName    = ''
                     OU                    = 'contoso.com\USA\Users'
-                },
-                [PSCustomObject]@{
-                    Name                  = 'Chuck Norris'
-                    SamAccountName        = 'norris'
-                    DisplayName           = 'Chuck Norris'
-                    AccountExpirationDate = (Get-Date).AddYears(-3)
-                    EmployeeType          = 'Actor'
-                    ManagerDisplayName    = ''
-                    OU                    = 'contoso.com\USA\Users\actors\hero'
                 }
             )
             TicketFields      = (
@@ -51,8 +47,8 @@
         }
         & $script @params
 
-        Create tickets for Bob Lee Swagger and Chuck Norris in case there aren't
-        any tickets created yet for them with the issue 'Computer - Inactive'.
+        Create tickets for Bob Lee Swagger in case there isn't a ticket created 
+        yet for the issue 'Computer - Inactive'.
 #>
 [CmdLetBinding()]
 param (
@@ -63,11 +59,11 @@ param (
     [Parameter(Mandatory)]
     [String]$TopicName,
     [Parameter(Mandatory)]
-    [String]$TopicDescription,
-    [Parameter(Mandatory)]
     [PSCustomObject[]]$Data,
+    [Parameter(Mandatory)]
     [PSCustomObject]$TicketFields,
-    [String[]]$ScriptAdmin = $env:POWERSHELL_SCRIPT_ADMIN
+    [Parameter(Mandatory)]
+    [String[]]$ScriptAdmin
 )
 
 begin {
@@ -109,7 +105,7 @@ begin {
     }
 
     try {
-        $M = "TopicName '$TopicName' TopicDescription '$TopicDescription'"
+        $M = "TopicName '$TopicName'"
         Write-Verbose $M
         Write-EventLog @EventVerboseParams -Message $M
 
