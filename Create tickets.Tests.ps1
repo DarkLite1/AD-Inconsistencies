@@ -121,7 +121,7 @@ Describe 'an error is thrown when' {
             $LASTEXITCODE | Should -Be 1
         }
     }
-} #-Tag test
+}
 Describe 'create no ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {

@@ -67,6 +67,26 @@ param (
 )
 
 begin {
+    function New-UniqueIdHC {
+        param (
+            [parameter(Mandatory)]
+            [String]$ScriptName,
+            [parameter(Mandatory)]
+            [String]$TopicName,
+            [parameter(Mandatory)]
+            [String]$SamAccountName
+        )
+
+        try {
+            'PSID_{0}_{1}_{2}' -f 
+            $($ScriptName.Replace(' ', '-')), 
+            $($TopicName.Replace(' ', '-')), 
+            $($SamAccountName.Replace(' ', '-'))
+        }
+        catch {
+            throw "Failed to create a unique ID for ScriptName '$ScriptName' TopicName '$TopicName' SamAccountName '$SamAccountName': $_"
+        }
+    }
     function New-ServiceNowSessionHC {
         param (
             [parameter(Mandatory)]
@@ -213,10 +233,13 @@ process {
             }
         ) {
             try {
-                #region Create unique ID
-                $uniqueId = 'PSID_{0}_{1}' -f 
-                $($TopicName.Replace(' ', '')), 
-                $($D.SamAccountName.Replace(' ','-'))
+                #region Get unique AD object issue ID
+                $params = @{
+                    ScriptName     = 'AD Inconsistencies' 
+                    TopicName      = $TopicName 
+                    SamAccountName = $D.SamAccountName
+                }
+                $uniqueId = New-UniqueIdHC @params
                 #endregion
 
                 
