@@ -84,6 +84,8 @@ begin {
 
                 Create a unique ID for the expiration of computer BELPC01
         #>
+
+        [CmdletBinding()]
         param (
             [parameter(Mandatory)]
             [String]$ScriptName,
@@ -94,16 +96,21 @@ begin {
         )
 
         try {
-            'PSID_{0}_{1}_{2}' -f 
+            $uniqueId = 'PSID_{0}_{1}_{2}' -f 
             $($ScriptName.Replace(' ', '-')), 
             $($TopicName.Replace(' ', '-')), 
             $($SamAccountName.Replace(' ', '-'))
+
+            Write-Verbose "Created unique AD object issue ID '$uniqueId'"
+
+            $uniqueId
         }
         catch {
             throw "Failed to create a unique ID for ScriptName '$ScriptName' TopicName '$TopicName' SamAccountName '$SamAccountName': $_"
         }
     }
     function New-ServiceNowSessionHC {
+        [CmdletBinding()]
         param (
             [parameter(Mandatory)]
             [String]$Uri,
@@ -126,6 +133,8 @@ begin {
                 $ClientId, 
                 ($ClientSecret | ConvertTo-SecureString -AsPlainText -Force)
             )
+
+            Write-Verbose "Create new ServiceNow session to '$Uri'"
             
             $params = @{
                 Url              = $Uri
