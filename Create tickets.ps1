@@ -219,6 +219,8 @@ process {
                 $($D.SamAccountName.Replace(' ','-'))
                 #endregion
 
+                
+
                 #region Create ticket
                 $KeyValuePair.Description = "
                 $TopicDescription

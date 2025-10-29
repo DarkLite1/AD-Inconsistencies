@@ -85,7 +85,9 @@ BeforeAll {
 }
 Describe 'the mandatory parameters are' {
     It '<_>' -ForEach @(
-        'ScriptName', 'ServiceNow', 'TopicName', 'TopicDescription', 'Data'
+        'ScriptName', 'ServiceNow',
+        'ScriptAdmin',
+        'TopicName', 'Data', 'TicketFields'
     ) {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory |
         Should -BeTrue
@@ -122,7 +124,7 @@ Describe 'an error is thrown when' {
             $LASTEXITCODE | Should -Be 1
         }
     }
-} -Tag test
+} #-Tag test
 Describe 'create no ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {
