@@ -146,6 +146,7 @@ Describe 'when a ticket was already created for an issue and not closed' {
         .$testScript @testNewParams
     }
     It 'create the correct unique AD object ID' {
+        Should -Invoke Get-ServiceNowRecord -Scope Describe
         $adObjectIssueId | Should -BeExactly $testUniqueAdObjectIssueID
     }
     It 'do not create a new ticket' {
