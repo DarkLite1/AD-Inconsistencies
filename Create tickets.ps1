@@ -261,31 +261,41 @@ process {
                 #endregion
 
                 #region Get open tickets for AD object issue
-                $openTickets = Get-ServiceNowRecord -Table incident -Filter (
-                    @('description', '-like', $adObjectIssueId),
-                    '-and',
-                    @('active', '-eq', 'true')
-                )
+                try {
+                    $openTickets = Get-ServiceNowRecord -Table incident -Filter (
+                        @('description', '-like', $adObjectIssueId),
+                        '-and',
+                        @('active', '-eq', 'true')
+                    )
+                }
+                catch {
+                    throw "Failed to retrieve open tickets for ID '$adObjectIssueId': $_"
+                }
                 #endregion
 
                 if (-not $openTickets) {
                     #region Create ticket
-                    $newTicketParams.Description = "
-                    $description
-                    <br><br>
-                    <table style=`"border:none`">
-                    $($D.PSObject.Properties | ForEach-Object {
-                        '<tr style="border:none;text-align:left;">
+                    try {
+                        $newTicketParams.Description = "
+                        $description
+                        <br><br>
+                        <table style=`"border:none`">
+                        $($D.PSObject.Properties | ForEach-Object {
+                            '<tr style="border:none;text-align:left;">
                             <th style="border:none;width:62px;color:lightGray;">{0}</th>
                             <td style="border:none;"><b>{1}</b></td>
-                        </tr>' -f $_.Name, $_.Value
-                    })
-                    </table>
-                    <br><br>PowerShell ID: $adObjectIssueId (do not remove)"
-    
-                    $ticket = New-ServiceNowIncident @newTicketParams -PassThru
-    
-                    Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with short description '$($newTicketParams.ShortDescription)'"
+                            </tr>' -f $_.Name, $_.Value
+                        })
+                        </table>
+                        <br><br>PowerShell ID: $adObjectIssueId (do not remove)"
+                        
+                        $ticket = New-ServiceNowIncident @newTicketParams -PassThru
+                        
+                        Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with short description '$($newTicketParams.ShortDescription)'"
+                    }
+                    catch {
+                        throw "Failed to create a ServiceNow ticket for ID '$adObjectIssueId': $_"
+                    }
                     #endregion
                 }
             }
