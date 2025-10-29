@@ -239,12 +239,12 @@ process {
                     TopicName      = $TopicName 
                     SamAccountName = $D.SamAccountName
                 }
-                $uniqueId = New-UniqueIdHC @params
+                $adObjectIssueUniqueId = New-UniqueIdHC @params
                 #endregion
 
                 #region Get open tickets for unique ID
                 $openTickets = Get-ServiceNowRecord -Table incident -Filter (
-                    @('description', '-like', $uniqueId),
+                    @('description', '-like', $adObjectIssueUniqueId),
                     '-and',
                     @('active', '-eq', 'true')
                 )
