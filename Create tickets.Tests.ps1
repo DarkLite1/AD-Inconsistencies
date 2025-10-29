@@ -4,20 +4,24 @@
 BeforeAll {
     $testScript = $PSCommandPath.Replace('.Tests.ps1', '.ps1')
     $TestParams = @{
-        ScriptName       = 'Test'
-        ServiceNow       = [PSCustomObject]@{
+        ScriptName   = 'Test'
+        ServiceNow   = [PSCustomObject]@{
             CredentialsFilePath = (New-Item -Path 'TestDrive:\a.json' -ItemType File).FullName
             Environment         = 'Test'
-            TicketFields        = @{}
+            TicketFields        = @{
+                Caller = 'x'
+            }
         }
-        SQLDatabase      = 'Test'
-        TopicName        = 'Computer - Inactive'
-        TopicDescription = "'LastLogonDate' over x days"
-        Data             = @(
+        TicketFields = @{
+            ShortDescription = 'x'
+        }
+        TopicName    = 'Computer - Inactive'
+        Data         = @(
             [PSCustomObject]@{
                 SamAccountName = 'PC1'
             }
         )
+        ScriptAdmin  = 'bob@contoso.com'
     }
 
     @{
@@ -67,21 +71,14 @@ BeforeAll {
         return $deepCopy
     }
 
-    Mock New-CherwellTicketHC { 1 }
+    Mock New-ServiceNowIncident { 
+        @{
+            number = 1
+        } 
+    }
     Mock New-ServiceNowSession { $true }
-    Mock Save-TicketInSqlHC
     Mock Send-MailHC
     Mock Write-EventLog
-    Mock Invoke-Sqlcmd
-    Mock Invoke-Sqlcmd -ParameterFilter {
-        $Query -like "*FROM $SQLTableTicketsDefaults*"
-    } -MockWith {
-        [PSCustomObject]@{
-            Requester          = 'jack'
-            SubmittedBy        = 'mike'
-            ServiceCountryCode = 'BNL'
-        }
-    }
 }
 Describe 'the mandatory parameters are' {
     It '<_>' -ForEach @(
@@ -92,7 +89,7 @@ Describe 'the mandatory parameters are' {
         (Get-Command $testScript).Parameters[$_].Attributes.Mandatory |
         Should -BeTrue
     }
-} -Tag test
+}
 Describe 'an error is thrown when' {
     BeforeEach {
         $ServiceNowSession = $null
@@ -145,7 +142,7 @@ Describe 'create no ticket' {
         .$testScript @testNewParams
     }
     It 'when a ticket was already created and it is still open' {
-        Should -Not -Invoke New-CherwellTicketHC -Scope Describe
+        Should -Not -Invoke New-ServiceNowIncident -Scope Describe
     }
 }
 Describe 'create a new ticket' {
@@ -176,7 +173,7 @@ Describe 'create a new ticket' {
     It 'when no ticket was created before or it was closed' {
         .$testScript @testNewParams
 
-        Should -Invoke New-CherwellTicketHC -Times 1 -Exactly
+        Should -Invoke New-ServiceNowIncident -Times 1 -Exactly
     }
     Context 'with properties from' {
         It 'SQL table ticketsDefaults when there are none in the .json file' {
@@ -184,7 +181,7 @@ Describe 'create a new ticket' {
 
             .$testScript @testNewParams
 
-            Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
+            Should -Invoke New-ServiceNowIncident -Times 1 -Exactly -ParameterFilter {
                 ($KeyValuePair.RequesterSamAccountName -eq 'jack') -and
                 ($KeyValuePair.SubmittedBySamAccountName -eq 'mike') -and
                 ($KeyValuePair.ServiceCountryCode -eq 'BNL')
@@ -199,7 +196,7 @@ Describe 'create a new ticket' {
 
             .$testScript @testNewParams
 
-            Should -Invoke New-CherwellTicketHC -Times 1 -Exactly -ParameterFilter {
+            Should -Invoke New-ServiceNowIncident -Times 1 -Exactly -ParameterFilter {
                 ($KeyValuePair.RequesterSamAccountName -eq 'picard') -and
                 ($KeyValuePair.SubmittedBySamAccountName -eq 'kirk') -and
                 ($KeyValuePair.ServiceCountryCode -eq 'BNL')
