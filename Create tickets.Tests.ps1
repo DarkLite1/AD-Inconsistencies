@@ -71,6 +71,7 @@ BeforeAll {
         return $deepCopy
     }
 
+    Mock Get-ServiceNowRecord
     Mock New-ServiceNowIncident { 
         @{
             number = 1

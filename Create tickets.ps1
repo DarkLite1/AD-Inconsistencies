@@ -242,26 +242,34 @@ process {
                 $uniqueId = New-UniqueIdHC @params
                 #endregion
 
-                
-
-                #region Create ticket
-                $KeyValuePair.Description = "
-                $TopicDescription
-                <br><br>
-                <table style=`"border:none`">
-                $($D.PSObject.Properties | ForEach-Object {
-                    '<tr style="border:none;text-align:left;">
-                        <th style="border:none;width:62px;color:lightGray;">{0}</th>
-                        <td style="border:none;"><b>{1}</b></td>
-                    </tr>' -f $_.Name, $_.Value
-                })
-                </table>"
-                
-
-                $ticket = New-ServiceNowIncident @params -PassThru
-
-                Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with short description '$($KeyValuePair.ShortDescription)'"
+                #region Get open tickets for unique ID
+                $openTickets = Get-ServiceNowRecord -Table incident -Filter (
+                    @('description', '-like', $uniqueId),
+                    '-and',
+                    @('active', '-eq', 'true')
+                )
                 #endregion
+
+                if (-not $openTickets) {
+                    #region Create ticket
+                    $KeyValuePair.Description = "
+                    $TopicDescription
+                    <br><br>
+                    <table style=`"border:none`">
+                    $($D.PSObject.Properties | ForEach-Object {
+                        '<tr style="border:none;text-align:left;">
+                            <th style="border:none;width:62px;color:lightGray;">{0}</th>
+                            <td style="border:none;"><b>{1}</b></td>
+                        </tr>' -f $_.Name, $_.Value
+                    })
+                    </table>"
+                    
+    
+                    $ticket = New-ServiceNowIncident @params -PassThru
+    
+                    Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with short description '$($KeyValuePair.ShortDescription)'"
+                    #endregion
+                }
             }
             catch {
                 throw "Failed creating a ticket for TopicName '$TopicName' SamAccountName '$($D.SamAccountName)': $_"
