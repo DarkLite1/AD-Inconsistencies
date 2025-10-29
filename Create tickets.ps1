@@ -67,7 +67,23 @@ param (
 )
 
 begin {
-    function Get-AdObjectIssueHC {
+    function Get-AdObjectIssueIdHC {
+        <# 
+            .SYNOPSIS
+                Create a unique ID for an AD object, its issue and its script
+
+            .EXAMPLE
+                $params = @{
+                    ScriptName     = 'AD Inconsistencies' 
+                    TopicName      = 'Computer expired'
+                    SamAccountName = 'BELPC01'
+                }
+                Get-AdObjectIssueIdHC @params
+
+                # returns: PSID_AD-Inconsistencies_Computer-expired_BELPC01
+
+                Create a unique ID for the expiration of computer BELPC01
+        #>
         param (
             [parameter(Mandatory)]
             [String]$ScriptName,
@@ -226,6 +242,8 @@ begin {
 
 process {
     try {
+        $description = $newTicketParams.Description
+
         foreach (
             $D in
             $Data | Where-Object {
@@ -239,7 +257,7 @@ process {
                     TopicName      = $TopicName 
                     SamAccountName = $D.SamAccountName
                 }
-                $adObjectIssueId = Get-AdObjectIssueHC @params
+                $adObjectIssueId = Get-AdObjectIssueIdHC @params
                 #endregion
 
                 #region Get open tickets for AD object issue
@@ -253,6 +271,7 @@ process {
                 if (-not $openTickets) {
                     #region Create ticket
                     $newTicketParams.Description = "
+                    $description
                     <br><br>
                     <table style=`"border:none`">
                     $($D.PSObject.Properties | ForEach-Object {
@@ -263,7 +282,6 @@ process {
                     })
                     </table>
                     <br><br>PowerShell ID: $adObjectIssueId (do not remove)"
-                    
     
                     $ticket = New-ServiceNowIncident @newTicketParams -PassThru
     
