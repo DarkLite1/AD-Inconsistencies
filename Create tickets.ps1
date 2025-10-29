@@ -253,7 +253,6 @@ process {
                 if (-not $openTickets) {
                     #region Create ticket
                     $KeyValuePair.Description = "
-                    $TopicDescription
                     <br><br>
                     <table style=`"border:none`">
                     $($D.PSObject.Properties | ForEach-Object {
@@ -262,7 +261,8 @@ process {
                             <td style="border:none;"><b>{1}</b></td>
                         </tr>' -f $_.Name, $_.Value
                     })
-                    </table>"
+                    </table>
+                    <br><br>PowerShell ID: $adObjectIssueId (do not remove)"
                     
     
                     $ticket = New-ServiceNowIncident @params -PassThru
