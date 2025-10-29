@@ -67,7 +67,7 @@ param (
 )
 
 begin {
-    function New-UniqueIdHC {
+    function Get-AdObjectIssueHC {
         param (
             [parameter(Mandatory)]
             [String]$ScriptName,
@@ -239,12 +239,12 @@ process {
                     TopicName      = $TopicName 
                     SamAccountName = $D.SamAccountName
                 }
-                $adObjectIssueUniqueId = New-UniqueIdHC @params
+                $adObjectIssueId = Get-AdObjectIssueHC @params
                 #endregion
 
                 #region Get open tickets for unique ID
                 $openTickets = Get-ServiceNowRecord -Table incident -Filter (
-                    @('description', '-like', $adObjectIssueUniqueId),
+                    @('description', '-like', $adObjectIssueId),
                     '-and',
                     @('active', '-eq', 'true')
                 )
