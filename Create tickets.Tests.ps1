@@ -123,14 +123,17 @@ Describe 'an error is thrown when' {
         }
     }
 }
-Describe 'create no ticket' {
+Describe 'when a ticket was already created for an issue and not closed' {
     BeforeAll {
-        Mock Invoke-Sqlcmd -ParameterFilter {
-            $Query -like "*FROM $SQLTableAdInconsistencies*"
-        } -MockWith {
-            [PSCustomObject]@{
-                SamAccountName = 'PC1'
+        $testUniqueAdObjectIssueID = 'PSID_AD-Inconsistencies_Computer---Inactive_PC1'
+
+        Mock Get-ServiceNowRecord {
+            @{
+                number = 5 
             }
+        } -ParameterFilter {
+            ($Table -eq 'incident' ) -and
+            ($Filter -like "$testUniqueAdObjectIssueID")
         }
 
         $testNewParams = $testParams.Clone()
@@ -142,10 +145,13 @@ Describe 'create no ticket' {
 
         .$testScript @testNewParams
     }
-    It 'when a ticket was already created and it is still open' {
+    It 'create the correct unique AD object ID' {
+        $adObjectIssueId | Should -BeExactly $testUniqueAdObjectIssueID
+    }
+    It 'do not create a new ticket' {
         Should -Not -Invoke New-ServiceNowIncident -Scope Describe
     }
-}
+} -Tag test
 Describe 'create a new ticket' {
     BeforeAll {
         Mock Invoke-Sqlcmd -ParameterFilter {
