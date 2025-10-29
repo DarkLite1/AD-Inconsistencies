@@ -291,7 +291,7 @@ process {
                         
                         $ticket = New-ServiceNowIncident @newTicketParams -PassThru
                         
-                        Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with description '$($newTicketParams.Description)'"
+                        Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' TopicName '$TopicName' SamAccountName '$($D.SamAccountName)' Description '$($newTicketParams.Description)'"
                     }
                     catch {
                         throw "Failed to create a ServiceNow ticket for ID '$adObjectIssueId': $_"
