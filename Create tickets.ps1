@@ -242,7 +242,7 @@ process {
                 $adObjectIssueId = Get-AdObjectIssueHC @params
                 #endregion
 
-                #region Get open tickets for unique ID
+                #region Get open tickets for AD object issue
                 $openTickets = Get-ServiceNowRecord -Table incident -Filter (
                     @('description', '-like', $adObjectIssueId),
                     '-and',
@@ -252,7 +252,7 @@ process {
 
                 if (-not $openTickets) {
                     #region Create ticket
-                    $KeyValuePair.Description = "
+                    $newTicketParams.Description = "
                     <br><br>
                     <table style=`"border:none`">
                     $($D.PSObject.Properties | ForEach-Object {
@@ -265,9 +265,9 @@ process {
                     <br><br>PowerShell ID: $adObjectIssueId (do not remove)"
                     
     
-                    $ticket = New-ServiceNowIncident @params -PassThru
+                    $ticket = New-ServiceNowIncident @newTicketParams -PassThru
     
-                    Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with short description '$($KeyValuePair.ShortDescription)'"
+                    Write-EventLog @EventOutParams -Message "Created ticket '$($ticket.number)' for '$($D.SamAccountName)' with short description '$($newTicketParams.ShortDescription)'"
                     #endregion
                 }
             }
