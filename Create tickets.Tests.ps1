@@ -227,4 +227,4 @@ Describe 'when no ticket was created or the ticket was closed' {
             ($InputData['impact'] -eq 2)
         }
     }
-} -Tag test
+}
