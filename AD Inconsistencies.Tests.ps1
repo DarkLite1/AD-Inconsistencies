@@ -948,8 +948,8 @@ Describe 'Exclude users' {
             }
             @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, Correct (Somewhere) BEL'
                 employeeType      = 'Resource'
             }
@@ -973,9 +973,9 @@ Describe 'Exclude users' {
             }
             @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
                 CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, Correct (Somewhere) BEL'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 employeeType      = 'Resource'
             }
         }
@@ -1059,7 +1059,7 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norris'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Vendor'
                 Manager           = $null
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
@@ -1107,7 +1107,7 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norris'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 EmployeeType      = 'Vendor'
                 Manager           = $null
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
@@ -1131,15 +1131,15 @@ Describe 'Users' {
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norrisc'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
-                Manager           = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                Manager           = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'lswagger'
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
-                Manager           = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                Manager           = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 ScriptPath        = ''
             }
@@ -1153,35 +1153,35 @@ Describe 'Users' {
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris, Chuck (Braine L'Alleud) BEL"
+                DisplayName       = "Norris, Chuck (Brussels) BEL"
                 EmployeeType      = 'Employee'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Incorrect plant user'
-                DisplayName       = "Norris, Chuck (Braine L'Alleud) BEL"
+                DisplayName       = "Norris, Chuck (Brussels) BEL"
                 EmployeeType      = 'Plant'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Incorrect kiosk user'
-                DisplayName       = "Norris, Chuck (Braine L'Alleud) BEL"
+                DisplayName       = "Norris, Chuck (Brussels) BEL"
                 EmployeeType      = 'Kiosk'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Incorrect resource account'
                 DisplayName       = 'wrong'
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Resource accounts/Dummy, CorrectUser (Somewhere) BEL'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Incorrect service account'
                 DisplayName       = 'wrong'
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, CorrectUser (Somewhere) BEL'
             }
         }
@@ -1217,22 +1217,22 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Incorrect'
-                DisplayName       = "Norris, Chuck (Braine L'Alleud) BEL"
+                DisplayName       = "Norris, Chuck (Brussels) BEL"
                 EmployeeType      = 'Plant'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, User'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Incorrect'
-                DisplayName       = "Norris, Chuck (Braine L'Alleud) BEL"
+                DisplayName       = "Norris, Chuck (Brussels) BEL"
                 EmployeeType      = 'Kiosk'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, User'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Incorrect'
-                DisplayName       = "Norris, Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris, Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Service accounts/Dummy, User'
             }
         }
@@ -1250,7 +1250,7 @@ Describe 'Users' {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
                 HomeDirectory     = $here
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
@@ -1275,7 +1275,7 @@ Describe 'Users' {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
                 HomeDirectory     = $here
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
@@ -1299,19 +1299,19 @@ Describe 'Users' {
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'norrisc'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 employeeType      = 'Vendor'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'lswagger'
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 employeeType      = 'Unknown'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'cdaniel'
-                DistinguishedName = "CN=Daniel Craig\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Daniel Craig\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 employeeType      = $null
             }
@@ -1329,13 +1329,13 @@ Describe 'Users' {
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'cnorris'
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, IncorrectUser (Somewhere) BEL'
                 employeeType      = 'Vendor'
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'lswagger'
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, CorrectUser (Somewhere) BEL'
                 employeeType      = 'Plant'
             }
@@ -1350,8 +1350,8 @@ Describe 'Users' {
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'InCorrect'
-                DisplayName       = "Lee Swagger, Bob (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Lee Swagger, Bob (Brussels) BEL"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\grouphc.net\bnl\lixhe\home\bbartels'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, InCorrect (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1359,8 +1359,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'InCorrect'
-                DisplayName       = "Lee Swagger, Bob (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Lee Swagger, Bob (Brussels) BEL"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\GROUPHC.NET\BNL\Centralized\HOME'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, InCorrect (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1368,8 +1368,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\grouphc.net\bnl\home\Correct'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1377,8 +1377,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\GROUPHC.NET\BNL\HOME\Centralized\Correct'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1386,8 +1386,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\grouphc.net\bnl\wrong'
                 CanonicalName     = 'contoso.com/EU/BEL/Service Accounts/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1395,8 +1395,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\GROUPHC.NET\BNL\wrong'
                 CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1412,8 +1412,8 @@ Describe 'Users' {
         Mock Get-ADUser {
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'InCorrect'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\grouphc.net\bnl\wrong'
                 CanonicalName     = 'contoso.com/EU/BEL/Service Accounts/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1421,8 +1421,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'InCorrect'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\GROUPHC.NET\BNL\wrong'
                 CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1430,8 +1430,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Lee Swagger, Bob (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Lee Swagger, Bob (Brussels) BEL"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\grouphc.net\bnl\lixhe\home\bbartels'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, InCorrect (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1439,8 +1439,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Lee Swagger, Bob (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Lee Swagger\, Bob (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Lee Swagger, Bob (Brussels) BEL"
+                DistinguishedName = "CN=Lee Swagger\, Bob (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\GROUPHC.NET\BNL\Centralized\HOME'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, InCorrect (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1448,8 +1448,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\grouphc.net\bnl\home\Correct'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1457,8 +1457,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Users,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = '\\GROUPHC.NET\BNL\HOME\Centralized\Correct'
                 CanonicalName     = 'contoso.com/EU/BEL/Users/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1466,8 +1466,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Service Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = $null
                 CanonicalName     = 'contoso.com/EU/BEL/Service Accounts/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
@@ -1475,8 +1475,8 @@ Describe 'Users' {
             }
             New-Object Microsoft.ActiveDirectory.Management.ADUser Identity -Property @{
                 SamAccountName    = 'Correct'
-                DisplayName       = "Norris Chuck (Braine L'Alleud) BEL"
-                DistinguishedName = "CN=Norris\, Chuck (Braine L'Alleud) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
+                DisplayName       = "Norris Chuck (Brussels) BEL"
+                DistinguishedName = "CN=Norris\, Chuck (Brussels) BEL,OU=Resource Accounts,OU=BEL,OU=EU,DC=contoso,DC=com"
                 homeDirectory     = ''
                 CanonicalName     = 'contoso.com/EU/BEL/Resource Accounts/Dummy, Correct (Somewhere) BEL'
                 ScriptPath        = ''
