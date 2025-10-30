@@ -8,8 +8,8 @@
 
     .DESCRIPTION
         Check if a ticket is already created for a specific topic and
-        distinguished name. Only create a new ticket when there is no ticket
-        yet in the database or when the previous ticket has been closed.
+        AD object. Only create a new ticket when there is no open ticket
+        in ServiceNow.
 
     .EXAMPLE
         $params = @{
