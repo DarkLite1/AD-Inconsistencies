@@ -121,6 +121,20 @@ Describe 'an error is thrown when' {
 
             $LASTEXITCODE | Should -Be 1
         }
+        It 'ServiceNow.TicketFields is missing a mandatory property' {
+            $testNewParams.ServiceNow.TicketFields = [PSCustomObject]@{
+                # Caller missing
+                ShortDescription = 'short description'
+            }
+
+            .$testScript @testNewParams
+
+            Should -Invoke Write-EventLog -Times 1 -Exactly -ParameterFilter {
+                ($Message -like "*Field 'Caller' not found. This field is mandatory to create a ticket in ServiceNow*")
+            }
+
+            $LASTEXITCODE | Should -Be 1
+        }
     }
 }
 Describe 'when a ticket was already created for an issue and not closed' {
@@ -174,6 +188,23 @@ Describe 'when no ticket was created or the ticket was closed' {
                 SamAccountName = 'PC2'
             }
         )
+        $testNewParams.ServiceNow.TicketFields = [PSCustomObject]@{
+            Caller           = 'bob'
+            ShortDescription = 'short description'
+            Description      = 'description'
+            Subcategory      = 'MS Office'
+            InputData        = [PSCustomObject]@{
+                service_offering = 'service offering'
+                impact           = 2
+            }
+        }
+        $testNewParams.TicketFields = [PSCustomObject]@{
+            ShortDescription = 'short description winner'
+            Category         = 'Software'
+            InputData        = [PSCustomObject]@{
+                service_offering = 'service offering winner'
+            }
+        }
 
         .$testScript @testNewParams
     }

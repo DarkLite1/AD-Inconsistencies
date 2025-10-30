@@ -241,6 +241,16 @@ begin {
             }
         }
         #endregion
+
+        #region Test mandatory ServiceNow arguments
+        @('Caller', 'ShortDescription').ForEach(
+            {
+                if (-not $newTicketParams.ContainsKey($_)) {
+                    throw "Field '$_' not found. This field is mandatory to create a ticket in ServiceNow"
+                }
+            }
+        )
+        #endregion
     }
     catch {
         Write-Warning $_
