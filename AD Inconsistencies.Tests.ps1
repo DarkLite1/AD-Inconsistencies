@@ -1814,15 +1814,19 @@ Describe "When the input file contains the parameter 'Tickets'" {
         function Start-TicketCreationScriptHC {
             param (
                 [Parameter(Mandatory)]
-                [ValidateScript({ Test-Path -LiteralPath $_ })]
-                [String]$Script,
+                [String]$ScriptFile,
+                [Parameter(Mandatory)]
+                [String]$ScriptName,
+                [Parameter(Mandatory)]
+                [PSCustomObject]$ServiceNow,
                 [Parameter(Mandatory)]
                 [String]$TopicName,
                 [Parameter(Mandatory)]
-                [String]$TopicDescription,
-                [Parameter(Mandatory)]
                 [PSCustomObject[]]$Data,
-                [PSCustomObject]$TicketFields
+                [Parameter(Mandatory)]
+                [PSCustomObject]$TicketFields,
+                [Parameter(Mandatory)]
+                [String[]]$ScriptAdmin
             )
         }
         Mock Start-TicketCreationScriptHC
@@ -1847,8 +1851,15 @@ Describe "When the input file contains the parameter 'Tickets'" {
         
         $testInputFile.Tickets = @{
             'Computer - Inactive' = @{
-                shortDescription = 'a'
-                description      = 'b'
+                ShortDescription = 'a'
+                Description      = 'b'
+            }
+        }
+        $testInputFile.ServiceNow = @{
+            CredentialsFilePath = 'c:\cred.json'
+            Environment         = 'test'
+            TicketFields        = @{
+                Caller = 'mike'
             }
         }
         $testInputFile | ConvertTo-Json | Out-File @testOutParams
@@ -1870,11 +1881,15 @@ Describe "When the input file contains the parameter 'Tickets'" {
     }
     It 'the ticket creation script is called' {
         Should -Invoke Start-TicketCreationScriptHC -Times 1 -Exactly -Scope Describe -ParameterFilter {
-            ($Script -eq $testParams.ScriptCreateTickets) -and
+            ($ScriptFile -eq $testParams.ScriptCreateTickets) -and
+            ($ScriptName -eq $testParams.ScriptName) -and
             ($TopicName -eq 'Computer - Inactive') -and
-            ($TopicDescription -like "'LastLogonDate' over*") -and
-            ($TicketFields.shortDescription -eq 'a') -and
-            ($TicketFields.description -eq 'b') -and
+            ($ScriptAdmin -eq $testParams.ScriptAdmin) -and
+            ($ServiceNow.CredentialsFilePath -eq 'c:\cred.json') -and
+            ($ServiceNow.Environment -eq 'test') -and
+            ($ServiceNow.TicketFields.Caller -eq 'mike') -and
+            ($TicketFields.ShortDescription -eq 'a') -and
+            ($TicketFields.Description -eq 'b') -and
             ($Data.SamAccountName -eq 'PC1$') -and
             ($Data.Name -eq 'PC1')
         }

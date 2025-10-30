@@ -104,6 +104,28 @@ begin {
             Get-Item -LiteralPath $Leaf -EA Stop
         }
     }
+    function Start-TicketCreationScriptHC {
+        param (
+            [Parameter(Mandatory)]
+            [String]$ScriptFile,
+            [Parameter(Mandatory)]
+            [String]$ScriptName,
+            [Parameter(Mandatory)]
+            [PSCustomObject]$ServiceNow,
+            [Parameter(Mandatory)]
+            [String]$TopicName,
+            [Parameter(Mandatory)]
+            [PSCustomObject[]]$Data,
+            [Parameter(Mandatory)]
+            [PSCustomObject]$TicketFields,
+            [Parameter(Mandatory)]
+            [String[]]$ScriptAdmin
+        )
+
+        $ScriptParameters = $PSBoundParameters.Clone()
+        $ScriptParameters.Remove('ScriptFile')
+        & $ScriptFile @ScriptParameters
+    }
 
     try {
         $Error.Clear()
@@ -1300,13 +1322,14 @@ end {
                 #region Create ticket
                 if ($createTicket) {
                     $params = @{
-                        ScriptName       = $ScriptName 
-                        ScriptAdmin      = $ScriptAdmin
-                        ServiceNow       = $file.ServiceNow 
-                        TopicName        = $A.Name
-                        TicketFields     = $File.Tickets."$($A.Name)" |
+                        ScriptFile   = $scriptCreateTicketsItem.FullName
+                        ScriptName   = $ScriptName 
+                        ScriptAdmin  = $ScriptAdmin
+                        ServiceNow   = $file.ServiceNow 
+                        TopicName    = $A.Name
+                        TicketFields = $File.Tickets."$($A.Name)" |
                         Select-Object -ExcludeProperty 'Exclude' 
-                        Data             = $A.Value.Data | Select-Object (
+                        Data         = $A.Value.Data | Select-Object (
                             @('SamAccountName') +
                             (
                                 $A.Value.PropertyToExport |
@@ -1314,7 +1337,7 @@ end {
                             )
                         )
                     }
-                    & $scriptCreateTicketsItem.FullName @params
+                    Start-TicketCreationScriptHC @params
                 }
                 #endregion
 
