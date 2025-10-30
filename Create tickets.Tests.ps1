@@ -8,11 +8,11 @@ BeforeAll {
         ServiceNow   = [PSCustomObject]@{
             CredentialsFilePath = (New-Item -Path 'TestDrive:\a.json' -ItemType File).FullName
             Environment         = 'Test'
-            TicketFields        = @{
+            TicketFields        = [PSCustomObject]@{
                 Caller = 'x'
             }
         }
-        TicketFields = @{
+        TicketFields = [PSCustomObject]@{
             ShortDescription = 'x'
         }
         TopicName    = 'Computer - Inactive'
@@ -157,63 +157,36 @@ Describe 'when a ticket was already created for an issue and not closed' {
     It 'do not create a new ticket' {
         Should -Not -Invoke New-ServiceNowIncident -Scope Describe
     }
-} -Tag test
-Describe 'create a new ticket' {
+}
+Describe 'when no ticket was created or the ticket was closed' {
     BeforeAll {
-        Mock Invoke-Sqlcmd -ParameterFilter {
-            $Query -like "*FROM $SQLTableTicketsDefaults*"
-        } -MockWith {
-            [PSCustomObject]@{
-                Requester          = 'jack'
-                SubmittedBy        = 'mike'
-                ServiceCountryCode = 'BNL'
-            }
+        $testUniqueAdObjectIssueID = 'PSID_AD-Inconsistencies_Computer---Inactive_PC2'
+
+        Mock Get-ServiceNowRecord {
+        } -ParameterFilter {
+            ($Table -eq 'incident' ) -and
+            ($Filter[0][2] -like "$testUniqueAdObjectIssueID")
         }
-        Mock Invoke-Sqlcmd -ParameterFilter {
-            $Query -like "*FROM $SQLTableAdInconsistencies*"
-        } -MockWith {
-            [PSCustomObject]@{
-                SamAccountName = 'PC1'
-            }
-        }
+
         $testNewParams = $testParams.Clone()
         $testNewParams.Data = @(
             [PSCustomObject]@{
                 SamAccountName = 'PC2'
             }
         )
-    }
-    It 'when no ticket was created before or it was closed' {
+
         .$testScript @testNewParams
-
-        Should -Invoke New-ServiceNowIncident -Times 1 -Exactly
     }
-    Context 'with properties from' {
-        It 'SQL table ticketsDefaults when there are none in the .json file' {
-            $testNewParams.TicketFields = $null
-
-            .$testScript @testNewParams
-
-            Should -Invoke New-ServiceNowIncident -Times 1 -Exactly -ParameterFilter {
-                ($KeyValuePair.RequesterSamAccountName -eq 'jack') -and
-                ($KeyValuePair.SubmittedBySamAccountName -eq 'mike') -and
-                ($KeyValuePair.ServiceCountryCode -eq 'BNL')
-            }
-        }
-        It 'the .json file, they overwrite the SQL ticketsDefaults' {
-            $testNewParams.TicketFields = [PSCustomObject]@{
-                RequesterSamAccountName   = 'picard'
-                SubmittedBySamAccountName = 'kirk'
-                ServiceCountryCode        = $null
-            }
-
-            .$testScript @testNewParams
-
-            Should -Invoke New-ServiceNowIncident -Times 1 -Exactly -ParameterFilter {
-                ($KeyValuePair.RequesterSamAccountName -eq 'picard') -and
-                ($KeyValuePair.SubmittedBySamAccountName -eq 'kirk') -and
-                ($KeyValuePair.ServiceCountryCode -eq 'BNL')
-            }
+    It 'create an ID to identify the AD object and its issue' {
+        $adObjectIssueId | Should -BeExactly $testUniqueAdObjectIssueID
+    }
+    It 'check if a ticket is created for this ID' {
+        Should -Invoke Get-ServiceNowRecord -Scope Describe -Times 1 -Exactly -ParameterFilter {
+            ($Table -eq 'incident' ) -and
+            ($Filter[0][2] -like "$testUniqueAdObjectIssueID")
         }
     }
-}
+    It 'create a new ticket' {
+        Should -Invoke New-ServiceNowIncident -Scope Describe
+    }
+} -Tag test
