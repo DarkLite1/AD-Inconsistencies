@@ -218,6 +218,13 @@ Describe 'when no ticket was created or the ticket was closed' {
         }
     }
     It 'create a new ticket' {
-        Should -Invoke New-ServiceNowIncident -Scope Describe
+        Should -Invoke New-ServiceNowIncident -Scope Describe -Times 1 -Exactly -ParameterFilter {
+            ($Caller -eq 'bob') -and
+            ($ShortDescription -eq 'short description winner') -and
+            ($Description -like '*description*SamAccountName*PC2*>PowerShell ID: PSID_AD-Inconsistencies_Computer---Inactive_PC2 (do not remove)*') -and
+            ($Subcategory -eq 'MS Office') -and
+            ($InputData['service_offering'] -eq 'service offering winner') -and
+            ($InputData['impact'] -eq 2)
+        }
     }
 } -Tag test
