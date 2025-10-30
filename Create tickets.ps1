@@ -271,7 +271,7 @@ process {
 
                 #region Get open tickets for AD object issue
                 try {
-                    $openTickets = Get-ServiceNowRecord -Table incident -Filter (
+                    $openTickets = Get-ServiceNowRecord -Table incident -Filter @(
                         @('description', '-like', $adObjectIssueId),
                         '-and',
                         @('active', '-eq', 'true')

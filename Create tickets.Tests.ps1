@@ -133,7 +133,7 @@ Describe 'when a ticket was already created for an issue and not closed' {
             }
         } -ParameterFilter {
             ($Table -eq 'incident' ) -and
-            ($Filter -like "$testUniqueAdObjectIssueID")
+            ($Filter[0][2] -like "$testUniqueAdObjectIssueID")
         }
 
         $testNewParams = $testParams.Clone()
@@ -145,9 +145,14 @@ Describe 'when a ticket was already created for an issue and not closed' {
 
         .$testScript @testNewParams
     }
-    It 'create the correct unique AD object ID' {
-        Should -Invoke Get-ServiceNowRecord -Scope Describe
+    It 'create an ID to identify the AD object and its issue' {
         $adObjectIssueId | Should -BeExactly $testUniqueAdObjectIssueID
+    }
+    It 'check if a ticket is created for this ID' {
+        Should -Invoke Get-ServiceNowRecord -Scope Describe -Times 1 -Exactly -ParameterFilter {
+            ($Table -eq 'incident' ) -and
+            ($Filter[0][2] -like "$testUniqueAdObjectIssueID")
+        }
     }
     It 'do not create a new ticket' {
         Should -Not -Invoke New-ServiceNowIncident -Scope Describe
