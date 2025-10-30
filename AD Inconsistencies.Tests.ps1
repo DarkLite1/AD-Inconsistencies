@@ -317,7 +317,7 @@ Describe 'ROL Groups' {
     }
     It 'filter out non ROL groups' {
         Mock Get-ADGroup {
-            $GroupName = 'BEL ROL-AGG-SAGREX Plant Manager'
+            $GroupName = 'BEL ROL-AGG-CONTOSO Plant Manager'
             New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
                 SamAccountName = $GroupName
                 Description    = 'ROL group'
@@ -348,7 +348,7 @@ Describe 'ROL Groups' {
         .$testScript @testParams
 
         $Groups | Should -HaveCount 3
-        $RolGroups.SamAccountName | Should -Be 'BEL ROL-AGG-SAGREX Plant Manager'
+        $RolGroups.SamAccountName | Should -Be 'BEL ROL-AGG-CONTOSO Plant Manager'
     }
     It 'Mail address cannot be blank' {
         Mock Get-ADGroup {
@@ -717,7 +717,7 @@ Describe 'Groups' {
     } 
     It 'distribution list no manager' {
         Mock Get-ADGroup {
-            $GroupName = 'BEL DIS-AGG-SAGREX Plant Manager'
+            $GroupName = 'BEL DIS-AGG-CONTOSO Plant Manager'
             New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
                 SamAccountName = $GroupName
                 Description    = 'DIS group no maanager'
@@ -727,17 +727,17 @@ Describe 'Groups' {
                 ManagedBy      = $null
             }
 
-            $GroupName = 'BEL DIS-AGG-SAGREX Employee'
+            $GroupName = 'BEL DIS-AGG-CONTOSO Employee'
             New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
                 SamAccountName = $GroupName
-                Description    = 'No DIS group no maanager'
+                Description    = 'No DIS group no manager'
                 CanonicalName  = 'contoso.com/EU/BEL/Groups/{0}' -f $GroupName
                 GroupCategory  = 'Security'
                 GroupScope     = 'Universal'
                 ManagedBy      = $null
             }
 
-            $GroupName = 'BEL DIS-AGG-SAGREX District Manager'
+            $GroupName = 'BEL DIS-AGG-CONTOSO District Manager'
             New-Object Microsoft.ActiveDirectory.Management.ADGroup Identity -Property @{
                 SamAccountName = $GroupName
                 Description    = 'DIS group with maanager'
@@ -761,7 +761,7 @@ Describe 'Groups' {
         .$testScript @testParams
 
         $AllObjects['Group - DisListNoManager'].Data.SamAccountName |
-        Should -Be 'BEL DIS-AGG-SAGREX Plant Manager'
+        Should -Be 'BEL DIS-AGG-CONTOSO Plant Manager'
     } 
     It 'member not in OU' {
         Mock Get-ADGroup {
